@@ -20,9 +20,10 @@ public class Cliente {
     @Column
     private int estado;
 
+    //Constructor vacío
     public Cliente() {
     }
-
+//COnstructor lleno
     public Cliente(String DPICliente, String nombreCliente, String apellidoCliente, String direccion, int estado) {
         this.DPICliente = DPICliente;
         this.nombreCliente = nombreCliente;
@@ -30,7 +31,7 @@ public class Cliente {
         this.direccion = direccion;
         this.estado = estado;
     }
-
+//Getter y Setters
     public String getDPICliente() {
         return DPICliente;
     }

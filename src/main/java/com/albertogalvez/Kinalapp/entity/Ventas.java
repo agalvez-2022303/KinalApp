@@ -1,84 +1,65 @@
 package com.albertogalvez.Kinalapp.entity;
 
 import jakarta.persistence.*;
-
 import java.util.Date;
 
 
 @Entity
-@Table(name = "Ventas")
+@Table(name = "ventas")
 public class Ventas {
+
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // Asume auto-increment
     @Column(name = "codigo_ventas")
-    private int codigoVentas;
+    private Integer codigoVentas;
+
     @Temporal(TemporalType.DATE)
     @Column(name = "fecha")
     private Date fecha;
-    @Column(name = "Total")
+
+    @Column(name = "total")
     private double total;
-    @Column(name = "Estado_Venta")
+
+    @Column(name = "estado_venta")
     private int estado;
-    @Column(name = "Dpi_Clientes")
-    private int dpiClientes;
-    @Column
-    private int codigoUsuarios;
-    //COnstructor Vacío
-    public Ventas(){}
-    //Constructor lleno
-    public Ventas(int codigoVentas, Date fecha, double total, int estado, int dpiClientes, int codigoUsuarios) {
-        this.codigoVentas = codigoVentas;
+
+    // Relación con Cliente
+    @ManyToOne
+    @JoinColumn(name = "dpi_clientes", referencedColumnName = "dpi_cliente")
+    private Cliente cliente;
+
+
+    @ManyToOne
+    @JoinColumn(name = "codigo_usuarios", referencedColumnName = "codigo_usuario")
+    private Usuario usuario;
+
+    // Constructores
+    public Ventas() {}
+
+    public Ventas(Date fecha, double total, int estado, Cliente cliente, Usuario usuario) {
         this.fecha = fecha;
         this.total = total;
         this.estado = estado;
-        this.dpiClientes = dpiClientes;
-        this.codigoUsuarios = codigoUsuarios;
+        this.cliente = cliente;
+        this.usuario = usuario;
     }
 
-    public int getCodigoVentas() {
-        return codigoVentas;
-    }
+    // Getters y Setters
+    public Integer getCodigoVentas() { return codigoVentas; }
+    public void setCodigoVentas(Integer codigoVentas) { this.codigoVentas = codigoVentas; }
 
-    public void setCodigoVentas(int codigoVentas) {
-        this.codigoVentas = codigoVentas;
-    }
+    public Date getFecha() { return fecha; }
+    public void setFecha(Date fecha) { this.fecha = fecha; }
 
-    public Date getFecha() {
-        return fecha;
-    }
+    public double getTotal() { return total; }
+    public void setTotal(double total) { this.total = total; }
 
-    public void setFecha(Date fecha) {
-        this.fecha = fecha;
-    }
+    public int getEstado() { return estado; }
+    public void setEstado(int estado) { this.estado = estado; }
 
-    public double getTotal() {
-        return total;
-    }
+    public Cliente getCliente() { return cliente; }
+    public void setCliente(Cliente cliente) { this.cliente = cliente; }
 
-    public void setTotal(double total) {
-        this.total = total;
-    }
-
-    public int getEstado() {
-        return estado;
-    }
-
-    public void setEstado(int estado) {
-        this.estado = estado;
-    }
-
-    public int getDpiClientes() {
-        return dpiClientes;
-    }
-
-    public void setDpiClientes(int dpiClientes) {
-        this.dpiClientes = dpiClientes;
-    }
-
-    public int getCodigoUsuarios() {
-        return codigoUsuarios;
-    }
-
-    public void setCodigoUsuarios(int codigoUsuarios) {
-        this.codigoUsuarios = codigoUsuarios;
-    }
+    public Usuario getUsuario() { return usuario; }
+    public void setUsuario(Usuario usuario) { this.usuario = usuario; }
 }

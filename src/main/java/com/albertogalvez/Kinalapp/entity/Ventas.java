@@ -23,7 +23,6 @@ public class Ventas {
     @Column(name = "estado_venta")
     private int estado;
 
-    // Relación con Cliente
     @ManyToOne
     @JoinColumn(name = "dpi_clientes", referencedColumnName = "dpi_cliente")
     private Cliente cliente;
@@ -33,7 +32,6 @@ public class Ventas {
     @JoinColumn(name = "codigo_usuarios", referencedColumnName = "codigo_usuario")
     private Usuario usuario;
 
-    // Constructores
     public Ventas() {}
 
     public Ventas(Date fecha, double total, int estado, Cliente cliente, Usuario usuario) {

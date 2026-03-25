@@ -38,11 +38,11 @@ public class Usuario {
         this.estado = estado;
     }
 //Getters and Setters
-    public Integer getCodigoUsuario() {
+    public int getCodigoUsuario() {
         return codigoUsuario;
     }
 
-    public void setCodigoUsuario(Integer codigoUsuario) {
+    public void setCodigoUsuario(int codigoUsuario) {
         this.codigoUsuario = codigoUsuario;
     }
 

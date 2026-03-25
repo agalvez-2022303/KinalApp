@@ -11,7 +11,7 @@ public class Ventas {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // Asume auto-increment
     @Column(name = "codigo_ventas")
-    private Integer codigoVentas;
+    private int codigoVentas;
 
     @Temporal(TemporalType.DATE)
     @Column(name = "fecha")
@@ -31,9 +31,9 @@ public class Ventas {
     @ManyToOne
     @JoinColumn(name = "codigo_usuarios", referencedColumnName = "codigo_usuario")
     private Usuario usuario;
-
+//Constructor vacío
     public Ventas() {}
-
+//Constructor lleno
     public Ventas(Date fecha, double total, int estado, Cliente cliente, Usuario usuario) {
         this.fecha = fecha;
         this.total = total;
@@ -43,8 +43,8 @@ public class Ventas {
     }
 
     // Getters y Setters
-    public Integer getCodigoVentas() { return codigoVentas; }
-    public void setCodigoVentas(Integer codigoVentas) { this.codigoVentas = codigoVentas; }
+    public int getCodigoVentas() { return codigoVentas; }
+    public void setCodigoVentas(int codigoVentas) { this.codigoVentas = codigoVentas; }
 
     public Date getFecha() { return fecha; }
     public void setFecha(Date fecha) { this.fecha = fecha; }

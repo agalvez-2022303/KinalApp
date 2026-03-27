@@ -5,6 +5,7 @@ import com.albertogalvez.Kinalapp.repository.VentasRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,14 +27,13 @@ public class VentasServices implements IVentasService {
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<Ventas> buscarPorId(Integer id) {
+    public Optional<Ventas> buscarPorId(Long id) {
         return ventasRepository.findById(id);
     }
 
     @Override
     public Ventas guardar(Ventas ventas) {
         validarVentas(ventas);
-        // Por ejemplo, si el estado no viene, se asigna 1 (activo)
         if (ventas.getEstado() == 0) {
             ventas.setEstado(1);
         }
@@ -41,17 +41,17 @@ public class VentasServices implements IVentasService {
     }
 
     @Override
-    public Ventas actualizar(Integer id, Ventas ventas) {
+    public Ventas actualizar(Long id, Ventas ventas) {
         if (!ventasRepository.existsById(id)) {
             throw new RuntimeException("Venta no encontrada con ID: " + id);
         }
-        ventas.setCodigoVentas(id); // Asegurar que el ID es el correcto
+        ventas.setCodigoVentas(id);
         validarVentas(ventas);
         return ventasRepository.save(ventas);
     }
 
     @Override
-    public void eliminar(Integer id) {
+    public void eliminar(Long id) {
         if (!ventasRepository.existsById(id)) {
             throw new RuntimeException("Venta no encontrada con ID: " + id);
         }
@@ -60,7 +60,7 @@ public class VentasServices implements IVentasService {
 
     @Override
     @Transactional(readOnly = true)
-    public boolean existePorId(Integer id) {
+    public boolean existePorId(Long id) {
         return ventasRepository.existsById(id);
     }
 
@@ -70,12 +70,11 @@ public class VentasServices implements IVentasService {
         return ventasRepository.findByEstado(estado);
     }
 
-    // Validaciones de negocio
     private void validarVentas(Ventas ventas) {
         if (ventas.getFecha() == null) {
             throw new IllegalArgumentException("La fecha de venta es obligatoria");
         }
-        if (ventas.getTotal() <= 0) {
+        if (ventas.getTotal() == null || ventas.getTotal().compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("El total debe ser mayor a cero");
         }
         if (ventas.getCliente() == null || ventas.getCliente().getDPICliente() == null) {

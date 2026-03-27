@@ -6,10 +6,10 @@ import java.util.Optional;
 
 public interface IUsuarioService {
     List<Usuario> listarTodos();
-    Optional<Usuario> buscarPorId(Integer id);
+    Optional<Usuario> buscarPorId(Long id);
     Usuario guardar(Usuario usuario);
-    Usuario actualizar(Integer id, Usuario usuario);
-    void eliminar(Integer id);
-    boolean existePorId(Integer id);
+    Usuario actualizar(Long id, Usuario usuario);
+    void eliminar(Long id);
+    boolean existePorId(Long id);
     List<Usuario> listarPorEstado(int estado);
 }

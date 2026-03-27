@@ -4,7 +4,7 @@ import com.albertogalvez.Kinalapp.entity.Ventas;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
-public interface VentasRepository extends JpaRepository<Ventas, Integer> {
+public interface VentasRepository extends JpaRepository<Ventas, Long> {
     //Buscar por estado
     List<Ventas> findByEstado(int estado);
     //Buscar por DPI

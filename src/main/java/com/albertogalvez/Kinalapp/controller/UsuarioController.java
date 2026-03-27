@@ -5,7 +5,6 @@ import com.albertogalvez.Kinalapp.service.IUsuarioService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
@@ -24,7 +23,7 @@ public class UsuarioController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Usuario> buscarPorId(@PathVariable Integer id) {
+    public ResponseEntity<Usuario> buscarPorId(@PathVariable Long id) { // Long
         return usuarioService.buscarPorId(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
@@ -41,7 +40,7 @@ public class UsuarioController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> actualizar(@PathVariable Integer id, @RequestBody Usuario usuario) {
+    public ResponseEntity<?> actualizar(@PathVariable Long id, @RequestBody Usuario usuario) {
         try {
             if (!usuarioService.existePorId(id)) {
                 return ResponseEntity.notFound().build();
@@ -56,7 +55,7 @@ public class UsuarioController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminar(@PathVariable Integer id) {
+    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
         try {
             if (!usuarioService.existePorId(id)) {
                 return ResponseEntity.notFound().build();

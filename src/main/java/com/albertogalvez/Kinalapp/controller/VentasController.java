@@ -5,7 +5,6 @@ import com.albertogalvez.Kinalapp.service.IVentasService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
@@ -24,7 +23,7 @@ public class VentasController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Ventas> buscarPorId(@PathVariable Integer id) {
+    public ResponseEntity<Ventas> buscarPorId(@PathVariable Long id) {
         return ventasService.buscarPorId(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
@@ -41,7 +40,7 @@ public class VentasController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> actualizar(@PathVariable Integer id, @RequestBody Ventas ventas) {
+    public ResponseEntity<?> actualizar(@PathVariable Long id, @RequestBody Ventas ventas) {
         try {
             if (!ventasService.existePorId(id)) {
                 return ResponseEntity.notFound().build();
@@ -56,7 +55,7 @@ public class VentasController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminar(@PathVariable Integer id) {
+    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
         try {
             if (!ventasService.existePorId(id)) {
                 return ResponseEntity.notFound().build();

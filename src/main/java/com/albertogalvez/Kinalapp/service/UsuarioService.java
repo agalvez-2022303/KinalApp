@@ -25,7 +25,7 @@ public class UsuarioService implements IUsuarioService {
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<Usuario> buscarPorId(Integer id) {
+    public Optional<Usuario> buscarPorId(Long id) {
         return usuarioRepository.findById(id);
     }
 
@@ -39,7 +39,7 @@ public class UsuarioService implements IUsuarioService {
     }
 
     @Override
-    public Usuario actualizar(Integer id, Usuario usuario) {
+    public Usuario actualizar(Long id, Usuario usuario) {
         if (!usuarioRepository.existsById(id)) {
             throw new RuntimeException("Usuario no encontrado con ID: " + id);
         }
@@ -49,7 +49,7 @@ public class UsuarioService implements IUsuarioService {
     }
 
     @Override
-    public void eliminar(Integer id) {
+    public void eliminar(Long id) {
         if (!usuarioRepository.existsById(id)) {
             throw new RuntimeException("Usuario no encontrado con ID: " + id);
         }
@@ -58,7 +58,7 @@ public class UsuarioService implements IUsuarioService {
 
     @Override
     @Transactional(readOnly = true)
-    public boolean existePorId(Integer id) {
+    public boolean existePorId(Long id) {
         return usuarioRepository.existsById(id);
     }
 

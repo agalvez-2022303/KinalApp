@@ -1,24 +1,24 @@
 package com.albertogalvez.Kinalapp.entity;
 
 import jakarta.persistence.*;
+import java.math.BigDecimal;
 import java.util.Date;
-
 
 @Entity
 @Table(name = "ventas")
 public class Ventas {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // Asume auto-increment
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "codigo_ventas")
-    private int codigoVentas;
+    private Long codigoVentas;
 
     @Temporal(TemporalType.DATE)
     @Column(name = "fecha")
     private Date fecha;
 
-    @Column(name = "total")
-    private double total;
+    @Column(name = "total", precision = 10, scale = 2)
+    private BigDecimal total; // Cambiado a BigDecimal
 
     @Column(name = "estado_venta")
     private int estado;
@@ -27,14 +27,15 @@ public class Ventas {
     @JoinColumn(name = "dpi_clientes", referencedColumnName = "dpi_cliente")
     private Cliente cliente;
 
-
     @ManyToOne
     @JoinColumn(name = "codigo_usuarios", referencedColumnName = "codigo_usuario")
     private Usuario usuario;
-//Constructor vacío
+
+    // Constructor vacío
     public Ventas() {}
-//Constructor lleno
-    public Ventas(Date fecha, double total, int estado, Cliente cliente, Usuario usuario) {
+
+    // Constructor lleno
+    public Ventas(Date fecha, BigDecimal total, int estado, Cliente cliente, Usuario usuario) {
         this.fecha = fecha;
         this.total = total;
         this.estado = estado;
@@ -43,21 +44,51 @@ public class Ventas {
     }
 
     // Getters y Setters
-    public int getCodigoVentas() { return codigoVentas; }
-    public void setCodigoVentas(int codigoVentas) { this.codigoVentas = codigoVentas; }
+    public Long getCodigoVentas() {
+        return codigoVentas;
+    }
 
-    public Date getFecha() { return fecha; }
-    public void setFecha(Date fecha) { this.fecha = fecha; }
+    public void setCodigoVentas(Long codigoVentas) {
+        this.codigoVentas = codigoVentas;
+    }
 
-    public double getTotal() { return total; }
-    public void setTotal(double total) { this.total = total; }
+    public Date getFecha() {
+        return fecha;
+    }
 
-    public int getEstado() { return estado; }
-    public void setEstado(int estado) { this.estado = estado; }
+    public void setFecha(Date fecha) {
+        this.fecha = fecha;
+    }
 
-    public Cliente getCliente() { return cliente; }
-    public void setCliente(Cliente cliente) { this.cliente = cliente; }
+    public BigDecimal getTotal() {
+        return total;
+    }
 
-    public Usuario getUsuario() { return usuario; }
-    public void setUsuario(Usuario usuario) { this.usuario = usuario; }
+    public void setTotal(BigDecimal total) {
+        this.total = total;
+    }
+
+    public int getEstado() {
+        return estado;
+    }
+
+    public void setEstado(int estado) {
+        this.estado = estado;
+    }
+
+    public Cliente getCliente() {
+        return cliente;
+    }
+
+    public void setCliente(Cliente cliente) {
+        this.cliente = cliente;
+    }
+
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
+    }
 }

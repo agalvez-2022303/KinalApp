@@ -9,7 +9,7 @@ public class Usuario {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "codigo_usuario")
-    private int codigoUsuario;
+    private Long codigoUsuario; // Cambiado a Long
 
     @Column(name = "username", nullable = false, length = 45)
     private String username;
@@ -37,12 +37,14 @@ public class Usuario {
         this.rol = rol;
         this.estado = estado;
     }
-//Getters and Setters
-    public int getCodigoUsuario() {
+
+   //Getter and setters
+
+    public Long getCodigoUsuario() {
         return codigoUsuario;
     }
 
-    public void setCodigoUsuario(int codigoUsuario) {
+    public void setCodigoUsuario(Long codigoUsuario) {
         this.codigoUsuario = codigoUsuario;
     }
 

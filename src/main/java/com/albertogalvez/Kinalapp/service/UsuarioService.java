@@ -94,6 +94,5 @@ public class UsuarioService implements IUsuarioService {
         if (usuario.getRol() == null || usuario.getRol().trim().isEmpty()) {
             throw new IllegalArgumentException("El rol es obligatorio");
         }
-        // Podría agregarse validación de formato de email, longitud, etc.
     }
 }

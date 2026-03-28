@@ -4,6 +4,7 @@ import com.albertogalvez.Kinalapp.entity.Usuario;
 import com.albertogalvez.Kinalapp.repository.UsuarioRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -25,8 +26,8 @@ public class UsuarioService implements IUsuarioService {
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<Usuario> buscarPorId(Long id) {
-        return usuarioRepository.findById(id);
+    public Optional<Usuario> buscarPorCodigo(Long codigo) {
+        return usuarioRepository.findById(codigo);
     }
 
     @Override
@@ -39,27 +40,27 @@ public class UsuarioService implements IUsuarioService {
     }
 
     @Override
-    public Usuario actualizar(Long id, Usuario usuario) {
-        if (!usuarioRepository.existsById(id)) {
-            throw new RuntimeException("Usuario no encontrado con ID: " + id);
+    public Usuario actualizar(Long codigo, Usuario usuario) {
+        if (!usuarioRepository.existsById(codigo)) {
+            throw new RuntimeException("Usuario no encontrado con código: " + codigo);
         }
-        usuario.setCodigoUsuario(id);
+        usuario.setCodigoUsuario(codigo);
         validarUsuario(usuario);
         return usuarioRepository.save(usuario);
     }
 
     @Override
-    public void eliminar(Long id) {
-        if (!usuarioRepository.existsById(id)) {
-            throw new RuntimeException("Usuario no encontrado con ID: " + id);
+    public void eliminar(Long codigo) {
+        if (!usuarioRepository.existsById(codigo)) {
+            throw new RuntimeException("Usuario no encontrado con código: " + codigo);
         }
-        usuarioRepository.deleteById(id);
+        usuarioRepository.deleteById(codigo);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public boolean existePorId(Long id) {
-        return usuarioRepository.existsById(id);
+    public boolean existePorCodigo(Long codigo) {
+        return usuarioRepository.existsById(codigo);
     }
 
     @Override
@@ -68,12 +69,31 @@ public class UsuarioService implements IUsuarioService {
         return usuarioRepository.findByEstado(estado);
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<Usuario> buscarPorUsername(String username) {
+        return usuarioRepository.findByUsername(username);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public boolean existeUsername(String username) {
+        return usuarioRepository.findByUsername(username).isPresent();
+    }
+
     private void validarUsuario(Usuario usuario) {
         if (usuario.getUsername() == null || usuario.getUsername().trim().isEmpty()) {
-            throw new IllegalArgumentException("El nombre de usuario es obligatorio");
+            throw new IllegalArgumentException("El username es obligatorio");
         }
         if (usuario.getPassword() == null || usuario.getPassword().trim().isEmpty()) {
             throw new IllegalArgumentException("La contraseña es obligatoria");
         }
+        if (usuario.getEmail() == null || usuario.getEmail().trim().isEmpty()) {
+            throw new IllegalArgumentException("El email es obligatorio");
+        }
+        if (usuario.getRol() == null || usuario.getRol().trim().isEmpty()) {
+            throw new IllegalArgumentException("El rol es obligatorio");
+        }
+        // Podría agregarse validación de formato de email, longitud, etc.
     }
 }

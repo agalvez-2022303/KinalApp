@@ -10,11 +10,11 @@ public class DetalleVenta {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "codigo_detalle_venta")
-    private Long codigoDetalleVenta; // Cambiado a Long
+    private Long codigoDetalleVenta;
 
-    @ManyToOne
-    @JoinColumn(name = "codigo_ventas", referencedColumnName = "codigo_ventas")
-    private Ventas venta;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "Ventas_codigo_venta", nullable = false)
+    private Venta venta;
 
     @ManyToOne
     @JoinColumn(name = "codigo_producto", referencedColumnName = "codigo_producto")
@@ -44,11 +44,11 @@ public class DetalleVenta {
         this.codigoDetalleVenta = codigoDetalleVenta;
     }
 
-    public Ventas getVenta() {
+    public Venta getVenta() {
         return venta;
     }
 
-    public void setVenta(Ventas venta) {
+    public void setVenta(Venta venta) {
         this.venta = venta;
     }
 

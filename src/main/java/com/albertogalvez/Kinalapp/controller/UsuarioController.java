@@ -5,6 +5,7 @@ import com.albertogalvez.Kinalapp.service.IUsuarioService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @RestController
@@ -22,9 +23,9 @@ public class UsuarioController {
         return ResponseEntity.ok(usuarioService.listarTodos());
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Usuario> buscarPorId(@PathVariable Long id) { // Long
-        return usuarioService.buscarPorId(id)
+    @GetMapping("/{codigo}")
+    public ResponseEntity<Usuario> buscarPorCodigo(@PathVariable Long codigo) {
+        return usuarioService.buscarPorCodigo(codigo)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -32,21 +33,30 @@ public class UsuarioController {
     @PostMapping
     public ResponseEntity<?> guardar(@RequestBody Usuario usuario) {
         try {
-            Usuario nuevoUsuario = usuarioService.guardar(usuario);
-            return new ResponseEntity<>(nuevoUsuario, HttpStatus.CREATED);
+            if (usuarioService.existeUsername(usuario.getUsername())) {
+                return ResponseEntity.badRequest().body("El username ya existe");
+            }
+            Usuario nuevo = usuarioService.guardar(usuario);
+            return new ResponseEntity<>(nuevo, HttpStatus.CREATED);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<?> actualizar(@PathVariable Long id, @RequestBody Usuario usuario) {
+    @PutMapping("/{codigo}")
+    public ResponseEntity<?> actualizar(@PathVariable Long codigo, @RequestBody Usuario usuario) {
         try {
-            if (!usuarioService.existePorId(id)) {
+            if (!usuarioService.existePorCodigo(codigo)) {
                 return ResponseEntity.notFound().build();
             }
-            Usuario usuarioActualizado = usuarioService.actualizar(id, usuario);
-            return ResponseEntity.ok(usuarioActualizado);
+            // Si se cambia el username, verificar que no exista otro con el mismo
+            Usuario existente = usuarioService.buscarPorCodigo(codigo).get();
+            if (!existente.getUsername().equals(usuario.getUsername())
+                    && usuarioService.existeUsername(usuario.getUsername())) {
+                return ResponseEntity.badRequest().body("El username ya está en uso por otro usuario");
+            }
+            Usuario actualizado = usuarioService.actualizar(codigo, usuario);
+            return ResponseEntity.ok(actualizado);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (RuntimeException e) {
@@ -54,13 +64,13 @@ public class UsuarioController {
         }
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
+    @DeleteMapping("/{codigo}")
+    public ResponseEntity<Void> eliminar(@PathVariable Long codigo) {
         try {
-            if (!usuarioService.existePorId(id)) {
+            if (!usuarioService.existePorCodigo(codigo)) {
                 return ResponseEntity.notFound().build();
             }
-            usuarioService.eliminar(id);
+            usuarioService.eliminar(codigo);
             return ResponseEntity.noContent().build();
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
@@ -69,6 +79,7 @@ public class UsuarioController {
 
     @GetMapping("/estado/{estado}")
     public ResponseEntity<List<Usuario>> listarPorEstado(@PathVariable int estado) {
-        return ResponseEntity.ok(usuarioService.listarPorEstado(estado));
+        List<Usuario> usuarios = usuarioService.listarPorEstado(estado);
+        return ResponseEntity.ok(usuarios);
     }
 }

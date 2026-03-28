@@ -16,7 +16,7 @@ public class Productos {
     private String nombre_producto;
 
     @Column(name = "Precio", precision = 10, scale = 2)
-    private BigDecimal precio; // Cambiado a BigDecimal
+    private BigDecimal precio;
 
     @Column(name = "Stock")
     private int stock;

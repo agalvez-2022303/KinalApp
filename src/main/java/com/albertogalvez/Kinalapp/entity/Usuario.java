@@ -9,7 +9,7 @@ public class Usuario {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "codigo_usuario")
-    private Long codigoUsuario; // Cambiado a Long
+    private Long codigoUsuario;
 
     @Column(name = "username", nullable = false, length = 45)
     private String username;
@@ -17,28 +17,28 @@ public class Usuario {
     @Column(name = "password", nullable = false, length = 45)
     private String password;
 
-    @Column(name = "email", length = 60)
+    @Column(name = "email", nullable = false, length = 60)
     private String email;
 
-    @Column(name = "rol", length = 45)
+    @Column(name = "rol", nullable = false, length = 45)
     private String rol;
 
     @Column(name = "estado")
     private int estado;
 
     // Constructor vacío
-    public Usuario() {}
+    public Usuario() {
+    }
 
     // Constructor lleno
-    public Usuario(String username, String password, String email, String rol, int estado) {
+    public Usuario(Long codigoUsuario, String username, String password, String email, String rol, int estado) {
+        this.codigoUsuario = codigoUsuario;
         this.username = username;
         this.password = password;
         this.email = email;
         this.rol = rol;
         this.estado = estado;
     }
-
-   //Getter and setters
 
     public Long getCodigoUsuario() {
         return codigoUsuario;

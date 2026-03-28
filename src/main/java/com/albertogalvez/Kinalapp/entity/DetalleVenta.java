@@ -21,7 +21,7 @@ public class DetalleVenta {
     private Productos producto;
 
     @Column(name = "cantidad", nullable = false)
-    private Integer cantidad;
+    private Long cantidad;          // cambiado de Integer a Long
 
     @Column(name = "precio_unitario", precision = 10, scale = 2)
     private BigDecimal precioUnitario;
@@ -30,12 +30,12 @@ public class DetalleVenta {
     private BigDecimal subtotal;
 
     @Column(name = "estado")
-    private Integer estado;
+    private Long estado;             // cambiado de Integer a Long
 
     // Constructor vacío
     public DetalleVenta() {}
 
-    // Getters y Setters
+    // Getters y Setters actualizados
     public Long getCodigoDetalleVenta() {
         return codigoDetalleVenta;
     }
@@ -60,11 +60,11 @@ public class DetalleVenta {
         this.producto = producto;
     }
 
-    public Integer getCantidad() {
+    public Long getCantidad() {               // tipo Long
         return cantidad;
     }
 
-    public void setCantidad(Integer cantidad) {
+    public void setCantidad(Long cantidad) {  // tipo Long
         this.cantidad = cantidad;
     }
 
@@ -84,11 +84,11 @@ public class DetalleVenta {
         this.subtotal = subtotal;
     }
 
-    public Integer getEstado() {
+    public Long getEstado() {                 // tipo Long
         return estado;
     }
 
-    public void setEstado(Integer estado) {
+    public void setEstado(Long estado) {      // tipo Long
         this.estado = estado;
     }
 }

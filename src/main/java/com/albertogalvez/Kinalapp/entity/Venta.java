@@ -34,11 +34,8 @@ public class Venta {
     @OneToMany(mappedBy = "venta", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<DetalleVenta> detalles;
 
-    // Constructor vacío
-    public Venta() {
-    }
+    public Venta() {}
 
-    // Constructor lleno
     public Venta(Long codigoVenta, LocalDate fechaVenta, BigDecimal total, int estado, Cliente cliente, Usuario usuario) {
         this.codigoVenta = codigoVenta;
         this.fechaVenta = fechaVenta;

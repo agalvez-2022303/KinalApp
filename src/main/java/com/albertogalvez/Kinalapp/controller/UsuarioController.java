@@ -49,7 +49,6 @@ public class UsuarioController {
             if (!usuarioService.existePorCodigo(codigo)) {
                 return ResponseEntity.notFound().build();
             }
-            // Si se cambia el username, verificar que no exista otro con el mismo
             Usuario existente = usuarioService.buscarPorCodigo(codigo).get();
             if (!existente.getUsername().equals(usuario.getUsername())
                     && usuarioService.existeUsername(usuario.getUsername())) {

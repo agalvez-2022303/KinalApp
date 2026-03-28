@@ -24,10 +24,8 @@ public class Productos {
     @Column(name = "Estado")
     private int estado;
 
-    // Constructor vacío
     public Productos() {}
 
-    // Constructor lleno
     public Productos(String nombre_producto, BigDecimal precio, int stock, int estado) {
         this.nombre_producto = nombre_producto;
         this.precio = precio;
@@ -35,7 +33,6 @@ public class Productos {
         this.estado = estado;
     }
 
-    // Getters y Setters
     public Long getCodigo_producto() {
         return codigo_producto;
     }

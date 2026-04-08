@@ -1,7 +1,6 @@
 package com.albertogalvez.Kinalapp.service;
 
 import com.albertogalvez.Kinalapp.entity.DetalleVenta;
-
 import java.util.List;
 import java.util.Optional;
 

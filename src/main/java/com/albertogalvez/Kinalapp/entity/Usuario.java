@@ -26,11 +26,8 @@ public class Usuario {
     @Column(name = "estado")
     private int estado;
 
-    // Constructor vacío
-    public Usuario() {
-    }
+    public Usuario() {}
 
-    // Constructor lleno
     public Usuario(Long codigoUsuario, String username, String password, String email, String rol, int estado) {
         this.codigoUsuario = codigoUsuario;
         this.username = username;

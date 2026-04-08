@@ -42,7 +42,6 @@ public class VentaService implements IVentaService {
     @Override
     public Venta guardar(Venta venta) {
         validarVenta(venta);
-        // Validar que cliente y usuario existan
         if (!clienteRepository.existsById(venta.getCliente().getDPICliente())) {
             throw new IllegalArgumentException("Cliente no encontrado");
         }
@@ -50,7 +49,7 @@ public class VentaService implements IVentaService {
             throw new IllegalArgumentException("Usuario no encontrado");
         }
         if (venta.getEstado() == 0) {
-            venta.setEstado(1); // Activo por defecto
+            venta.setEstado(1);
         }
         return ventaRepository.save(venta);
     }
@@ -62,6 +61,13 @@ public class VentaService implements IVentaService {
         }
         venta.setCodigoVenta(codigo);
         validarVenta(venta);
+        // Validar que el cliente y usuario existan (pueden cambiar en la actualización)
+        if (!clienteRepository.existsById(venta.getCliente().getDPICliente())) {
+            throw new IllegalArgumentException("Cliente no encontrado");
+        }
+        if (!usuarioRepository.existsById(venta.getUsuario().getCodigoUsuario())) {
+            throw new IllegalArgumentException("Usuario no encontrado");
+        }
         return ventaRepository.save(venta);
     }
 

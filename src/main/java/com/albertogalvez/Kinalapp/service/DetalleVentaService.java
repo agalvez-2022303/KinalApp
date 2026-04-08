@@ -34,7 +34,11 @@ public class DetalleVentaService implements IDetalleVentaService {
     @Override
     public DetalleVenta guardar(DetalleVenta detalleVenta) {
         validarDetalleVenta(detalleVenta);
-        // Calcular subtotal si no viene correcto
+        // Asignar estado por defecto si no viene
+        if (detalleVenta.getEstado() == null) {
+            detalleVenta.setEstado(1L);
+        }
+        // Calcular subtotal si no viene o es cero
         if (detalleVenta.getSubtotal() == null || detalleVenta.getSubtotal().compareTo(BigDecimal.ZERO) == 0) {
             BigDecimal subtotal = detalleVenta.getPrecioUnitario()
                     .multiply(BigDecimal.valueOf(detalleVenta.getCantidad()));
@@ -50,7 +54,7 @@ public class DetalleVentaService implements IDetalleVentaService {
         }
         detalleVenta.setCodigoDetalleVenta(codigo);
         validarDetalleVenta(detalleVenta);
-        // Recalcular subtotal
+        // Recalcular subtotal siempre
         BigDecimal subtotal = detalleVenta.getPrecioUnitario()
                 .multiply(BigDecimal.valueOf(detalleVenta.getCantidad()));
         detalleVenta.setSubtotal(subtotal);

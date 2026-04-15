@@ -1,5 +1,6 @@
 package com.albertogalvez.Kinalapp.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -25,13 +26,16 @@ public class Venta {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "Clientes_dpi_cliente", referencedColumnName = "dpi_cliente", nullable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "ventas", "detalles"})
     private Cliente cliente;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "Usuarios_codigo_usuario", referencedColumnName = "codigo_usuario", nullable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "ventas"})
     private Usuario usuario;
 
     @OneToMany(mappedBy = "venta", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "venta"})
     private List<DetalleVenta> detalles;
 
     public Venta() {}
@@ -45,59 +49,24 @@ public class Venta {
         this.usuario = usuario;
     }
 
-    public Long getCodigoVenta() {
-        return codigoVenta;
-    }
+    public Long getCodigoVenta() { return codigoVenta; }
+    public void setCodigoVenta(Long codigoVenta) { this.codigoVenta = codigoVenta; }
 
-    public void setCodigoVenta(Long codigoVenta) {
-        this.codigoVenta = codigoVenta;
-    }
+    public LocalDate getFechaVenta() { return fechaVenta; }
+    public void setFechaVenta(LocalDate fechaVenta) { this.fechaVenta = fechaVenta; }
 
-    public LocalDate getFechaVenta() {
-        return fechaVenta;
-    }
+    public BigDecimal getTotal() { return total; }
+    public void setTotal(BigDecimal total) { this.total = total; }
 
-    public void setFechaVenta(LocalDate fechaVenta) {
-        this.fechaVenta = fechaVenta;
-    }
+    public int getEstado() { return estado; }
+    public void setEstado(int estado) { this.estado = estado; }
 
-    public BigDecimal getTotal() {
-        return total;
-    }
+    public Cliente getCliente() { return cliente; }
+    public void setCliente(Cliente cliente) { this.cliente = cliente; }
 
-    public void setTotal(BigDecimal total) {
-        this.total = total;
-    }
+    public Usuario getUsuario() { return usuario; }
+    public void setUsuario(Usuario usuario) { this.usuario = usuario; }
 
-    public int getEstado() {
-        return estado;
-    }
-
-    public void setEstado(int estado) {
-        this.estado = estado;
-    }
-
-    public Cliente getCliente() {
-        return cliente;
-    }
-
-    public void setCliente(Cliente cliente) {
-        this.cliente = cliente;
-    }
-
-    public Usuario getUsuario() {
-        return usuario;
-    }
-
-    public void setUsuario(Usuario usuario) {
-        this.usuario = usuario;
-    }
-
-    public List<DetalleVenta> getDetalles() {
-        return detalles;
-    }
-
-    public void setDetalles(List<DetalleVenta> detalles) {
-        this.detalles = detalles;
-    }
+    public List<DetalleVenta> getDetalles() { return detalles; }
+    public void setDetalles(List<DetalleVenta> detalles) { this.detalles = detalles; }
 }

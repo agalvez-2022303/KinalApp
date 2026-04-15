@@ -42,7 +42,7 @@ public class VentaService implements IVentaService {
     @Override
     public Venta guardar(Venta venta) {
         validarVenta(venta);
-        if (!clienteRepository.existsById(venta.getCliente().getDPICliente())) {
+        if (!clienteRepository.existsById(venta.getCliente().getDpiCliente())) {
             throw new IllegalArgumentException("Cliente no encontrado");
         }
         if (!usuarioRepository.existsById(venta.getUsuario().getCodigoUsuario())) {
@@ -61,8 +61,7 @@ public class VentaService implements IVentaService {
         }
         venta.setCodigoVenta(codigo);
         validarVenta(venta);
-        // Validar que el cliente y usuario existan (pueden cambiar en la actualización)
-        if (!clienteRepository.existsById(venta.getCliente().getDPICliente())) {
+        if (!clienteRepository.existsById(venta.getCliente().getDpiCliente())) {
             throw new IllegalArgumentException("Cliente no encontrado");
         }
         if (!usuarioRepository.existsById(venta.getUsuario().getCodigoUsuario())) {
@@ -94,7 +93,7 @@ public class VentaService implements IVentaService {
     @Override
     @Transactional(readOnly = true)
     public List<Venta> listarPorCliente(String dpiCliente) {
-        return ventaRepository.findByClienteDPICliente(dpiCliente);
+        return ventaRepository.findByClienteDpiCliente(dpiCliente);
     }
 
     private void validarVenta(Venta venta) {

@@ -1,5 +1,6 @@
 package com.albertogalvez.Kinalapp.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 
@@ -14,14 +15,16 @@ public class DetalleVenta {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "Ventas_codigo_venta", nullable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "detalles"})
     private Venta venta;
 
     @ManyToOne
     @JoinColumn(name = "codigo_producto", referencedColumnName = "codigo_producto")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Productos producto;
 
     @Column(name = "cantidad", nullable = false)
-    private Long cantidad;          // cambiado de Integer a Long
+    private Long cantidad;
 
     @Column(name = "precio_unitario", precision = 10, scale = 2)
     private BigDecimal precioUnitario;
@@ -30,65 +33,28 @@ public class DetalleVenta {
     private BigDecimal subtotal;
 
     @Column(name = "estado")
-    private Long estado;             // cambiado de Integer a Long
+    private Long estado;
 
-    // Constructor vacío
     public DetalleVenta() {}
 
-    // Getters y Setters actualizados
-    public Long getCodigoDetalleVenta() {
-        return codigoDetalleVenta;
-    }
+    public Long getCodigoDetalleVenta() { return codigoDetalleVenta; }
+    public void setCodigoDetalleVenta(Long codigoDetalleVenta) { this.codigoDetalleVenta = codigoDetalleVenta; }
 
-    public void setCodigoDetalleVenta(Long codigoDetalleVenta) {
-        this.codigoDetalleVenta = codigoDetalleVenta;
-    }
+    public Venta getVenta() { return venta; }
+    public void setVenta(Venta venta) { this.venta = venta; }
 
-    public Venta getVenta() {
-        return venta;
-    }
+    public Productos getProducto() { return producto; }
+    public void setProducto(Productos producto) { this.producto = producto; }
 
-    public void setVenta(Venta venta) {
-        this.venta = venta;
-    }
+    public Long getCantidad() { return cantidad; }
+    public void setCantidad(Long cantidad) { this.cantidad = cantidad; }
 
-    public Productos getProducto() {
-        return producto;
-    }
+    public BigDecimal getPrecioUnitario() { return precioUnitario; }
+    public void setPrecioUnitario(BigDecimal precioUnitario) { this.precioUnitario = precioUnitario; }
 
-    public void setProducto(Productos producto) {
-        this.producto = producto;
-    }
+    public BigDecimal getSubtotal() { return subtotal; }
+    public void setSubtotal(BigDecimal subtotal) { this.subtotal = subtotal; }
 
-    public Long getCantidad() {               // tipo Long
-        return cantidad;
-    }
-
-    public void setCantidad(Long cantidad) {  // tipo Long
-        this.cantidad = cantidad;
-    }
-
-    public BigDecimal getPrecioUnitario() {
-        return precioUnitario;
-    }
-
-    public void setPrecioUnitario(BigDecimal precioUnitario) {
-        this.precioUnitario = precioUnitario;
-    }
-
-    public BigDecimal getSubtotal() {
-        return subtotal;
-    }
-
-    public void setSubtotal(BigDecimal subtotal) {
-        this.subtotal = subtotal;
-    }
-
-    public Long getEstado() {                 // tipo Long
-        return estado;
-    }
-
-    public void setEstado(Long estado) {      // tipo Long
-        this.estado = estado;
-    }
+    public Long getEstado() { return estado; }
+    public void setEstado(Long estado) { this.estado = estado; }
 }

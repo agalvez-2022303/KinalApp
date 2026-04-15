@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface VentaRepository extends JpaRepository<Venta, Long> {
     List<Venta> findByEstado(int estado);
-    List<Venta> findByClienteDPICliente(String dpiCliente);
+    List<Venta> findByClienteDpiCliente(String dpiCliente); // ← antes era findByClienteDPICliente
 }

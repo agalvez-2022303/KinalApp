@@ -34,11 +34,9 @@ public class DetalleVentaService implements IDetalleVentaService {
     @Override
     public DetalleVenta guardar(DetalleVenta detalleVenta) {
         validarDetalleVenta(detalleVenta);
-        // Asignar estado por defecto si no viene
         if (detalleVenta.getEstado() == null) {
             detalleVenta.setEstado(1L);
         }
-        // Calcular subtotal si no viene o es cero
         if (detalleVenta.getSubtotal() == null || detalleVenta.getSubtotal().compareTo(BigDecimal.ZERO) == 0) {
             BigDecimal subtotal = detalleVenta.getPrecioUnitario()
                     .multiply(BigDecimal.valueOf(detalleVenta.getCantidad()));
@@ -54,7 +52,6 @@ public class DetalleVentaService implements IDetalleVentaService {
         }
         detalleVenta.setCodigoDetalleVenta(codigo);
         validarDetalleVenta(detalleVenta);
-        // Recalcular subtotal siempre
         BigDecimal subtotal = detalleVenta.getPrecioUnitario()
                 .multiply(BigDecimal.valueOf(detalleVenta.getCantidad()));
         detalleVenta.setSubtotal(subtotal);
@@ -82,17 +79,17 @@ public class DetalleVentaService implements IDetalleVentaService {
     }
 
     private void validarDetalleVenta(DetalleVenta detalleVenta) {
-        if (detalleVenta.getCantidad() <= 0) {
-            throw new IllegalArgumentException("La cantidad debe ser mayor a cero");
-        }
-        if (detalleVenta.getPrecioUnitario() == null || detalleVenta.getPrecioUnitario().compareTo(BigDecimal.ZERO) <= 0) {
-            throw new IllegalArgumentException("El precio unitario debe ser mayor a cero");
+        if (detalleVenta.getVenta() == null) {
+            throw new IllegalArgumentException("La venta es obligatoria");
         }
         if (detalleVenta.getProducto() == null) {
             throw new IllegalArgumentException("El producto es obligatorio");
         }
-        if (detalleVenta.getVenta() == null) {
-            throw new IllegalArgumentException("La venta es obligatoria");
+        if (detalleVenta.getCantidad() == null || detalleVenta.getCantidad() <= 0) {
+            throw new IllegalArgumentException("La cantidad debe ser mayor a cero");
+        }
+        if (detalleVenta.getPrecioUnitario() == null || detalleVenta.getPrecioUnitario().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("El precio unitario debe ser mayor a cero");
         }
     }
 }

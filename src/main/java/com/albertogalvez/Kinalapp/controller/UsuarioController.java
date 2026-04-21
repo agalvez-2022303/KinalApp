@@ -2,13 +2,12 @@ package com.albertogalvez.Kinalapp.controller;
 
 import com.albertogalvez.Kinalapp.entity.Usuario;
 import com.albertogalvez.Kinalapp.service.IUsuarioService;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.List;
-
-@RestController
+@Controller
 @RequestMapping("/usuarios")
 public class UsuarioController {
 
@@ -18,67 +17,92 @@ public class UsuarioController {
         this.usuarioService = usuarioService;
     }
 
+    // LISTAR TODOS
     @GetMapping
-    public ResponseEntity<List<Usuario>> listar() {
-        return ResponseEntity.ok(usuarioService.listarTodos());
+    public String listarTodos(Model model) {
+        model.addAttribute("usuarios", usuarioService.listarTodos());
+        model.addAttribute("viewTitle", "Todos los Usuarios");
+        return "usuarios";
     }
 
-    @GetMapping("/{codigo}")
-    public ResponseEntity<Usuario> buscarPorCodigo(@PathVariable Long codigo) {
-        return usuarioService.buscarPorCodigo(codigo)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    // LISTAR ACTIVOS
+    @GetMapping("/activos")
+    public String listarActivos(Model model) {
+        model.addAttribute("usuarios", usuarioService.listarEstadoUsuario());
+        model.addAttribute("viewTitle", "Usuarios Activos");
+        return "usuarios";
     }
 
-    @PostMapping
-    public ResponseEntity<?> guardar(@RequestBody Usuario usuario) {
+    // BUSCAR POR ID
+    @GetMapping("/buscar")
+    public String buscarPorId(@RequestParam(value = "id", required = false) Integer id, Model model, RedirectAttributes flash) {
+        if (id == null) {
+            flash.addFlashAttribute("error", "Debe ingresar un ID para buscar");
+            return "redirect:/usuarios";
+        }
+
+        var usuario = usuarioService.buscarPorId(id);
+        if (usuario.isPresent()) {
+            model.addAttribute("usuarios", java.util.List.of(usuario.get()));
+            model.addAttribute("viewTitle", "Resultado de búsqueda: ID " + id);
+        } else {
+            model.addAttribute("usuarios", usuarioService.listarTodos());
+            model.addAttribute("error", "No se encontró el usuario con ID: " + id);
+            model.addAttribute("viewTitle", "Todos los Usuarios");
+        }
+        return "usuarios";
+    }
+
+    // FORMULARIO NUEVO
+    @GetMapping("/nuevo")
+    public String mostrarFormularioNuevo(Model model) {
+        model.addAttribute("usuario", new Usuario());
+        model.addAttribute("viewTitle", "Registrar Nuevo Usuario");
+        return "formularioUsuario";
+    }
+
+    // GUARDAR
+    @PostMapping("/guardar")
+    public String guardar(@ModelAttribute Usuario usuario, RedirectAttributes flash) {
         try {
-            if (usuarioService.existeUsername(usuario.getUsername())) {
-                return ResponseEntity.badRequest().body("El username ya existe");
+            if (usuario.getEstado() == 0) {
+                usuario.setEstado(1);
             }
-            Usuario nuevo = usuarioService.guardar(usuario);
-            return new ResponseEntity<>(nuevo, HttpStatus.CREATED);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            usuarioService.guardar(usuario);
+            flash.addFlashAttribute("success", "Usuario guardado correctamente");
+        } catch (Exception e) {
+            flash.addFlashAttribute("error", "Error al guardar usuario: " + e.getMessage());
+        }
+        return "redirect:/usuarios";
+    }
+
+    // FORMULARIO EDITAR
+    @GetMapping("/editar/{id}")
+    public String mostrarFormularioEditar(@PathVariable int id, Model model, RedirectAttributes flash) {
+        var usuario = usuarioService.buscarPorId(id);
+        if (usuario.isPresent()) {
+            model.addAttribute("usuario", usuario.get());
+            model.addAttribute("viewTitle", "Editar Usuario: " + usuario.get().getUsername());
+            return "formularioUsuario";
+        } else {
+            flash.addFlashAttribute("error", "El usuario no existe");
+            return "redirect:/usuarios";
         }
     }
 
-    @PutMapping("/{codigo}")
-    public ResponseEntity<?> actualizar(@PathVariable Long codigo, @RequestBody Usuario usuario) {
+    // ELIMINAR
+    @GetMapping("/eliminar/{id}")
+    public String eliminar(@PathVariable int id, RedirectAttributes flash) {
         try {
-            if (!usuarioService.existePorCodigo(codigo)) {
-                return ResponseEntity.notFound().build();
+            if (usuarioService.existePorId(id)) {
+                usuarioService.eliminar(id);
+                flash.addFlashAttribute("success", "Usuario eliminado con éxito");
+            } else {
+                flash.addFlashAttribute("error", "No se pudo eliminar, el usuario no existe");
             }
-            Usuario existente = usuarioService.buscarPorCodigo(codigo).get();
-            if (!existente.getUsername().equals(usuario.getUsername())
-                    && usuarioService.existeUsername(usuario.getUsername())) {
-                return ResponseEntity.badRequest().body("El username ya está en uso por otro usuario");
-            }
-            Usuario actualizado = usuarioService.actualizar(codigo, usuario);
-            return ResponseEntity.ok(actualizado);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            flash.addFlashAttribute("error", "Error al eliminar: " + e.getMessage());
         }
-    }
-
-    @DeleteMapping("/{codigo}")
-    public ResponseEntity<Void> eliminar(@PathVariable Long codigo) {
-        try {
-            if (!usuarioService.existePorCodigo(codigo)) {
-                return ResponseEntity.notFound().build();
-            }
-            usuarioService.eliminar(codigo);
-            return ResponseEntity.noContent().build();
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
-    }
-
-    @GetMapping("/estado/{estado}")
-    public ResponseEntity<List<Usuario>> listarPorEstado(@PathVariable int estado) {
-        List<Usuario> usuarios = usuarioService.listarPorEstado(estado);
-        return ResponseEntity.ok(usuarios);
+        return "redirect:/usuarios";
     }
 }

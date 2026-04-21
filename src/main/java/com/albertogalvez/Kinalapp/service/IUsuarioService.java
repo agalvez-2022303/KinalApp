@@ -1,17 +1,25 @@
 package com.albertogalvez.Kinalapp.service;
 
 import com.albertogalvez.Kinalapp.entity.Usuario;
+
 import java.util.List;
 import java.util.Optional;
 
-public interface IUsuarioService {
+public interface IUsuarioService{
+
     List<Usuario> listarTodos();
-    Optional<Usuario> buscarPorCodigo(Long codigo);
+
+    List<Usuario> listarEstadoUsuario();
+
     Usuario guardar(Usuario usuario);
-    Usuario actualizar(Long codigo, Usuario usuario);
-    void eliminar(Long codigo);
-    boolean existePorCodigo(Long codigo);
-    List<Usuario> listarPorEstado(int estado);
-    Optional<Usuario> buscarPorUsername(String username);
-    boolean existeUsername(String username);
+
+    Optional<Usuario> buscarPorId(int id);
+
+    Optional<Usuario> buscarPorEmail(String email);
+
+    Usuario actualizar(int id, Usuario usuario);
+
+    void eliminar(int id);
+
+    boolean existePorId(int id);
 }

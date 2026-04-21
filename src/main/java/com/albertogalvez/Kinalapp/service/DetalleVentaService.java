@@ -1,11 +1,14 @@
 package com.albertogalvez.Kinalapp.service;
 
 import com.albertogalvez.Kinalapp.entity.DetalleVenta;
+import com.albertogalvez.Kinalapp.entity.Producto;
+import com.albertogalvez.Kinalapp.entity.Venta;
 import com.albertogalvez.Kinalapp.repository.DetalleVentaRepository;
+import com.albertogalvez.Kinalapp.repository.ProductoRepository;
+import com.albertogalvez.Kinalapp.repository.VentaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,82 +17,52 @@ import java.util.Optional;
 public class DetalleVentaService implements IDetalleVentaService {
 
     private final DetalleVentaRepository detalleVentaRepository;
+    private final VentaRepository ventaRepository;
+    private final ProductoRepository productoRepository;
 
-    public DetalleVentaService(DetalleVentaRepository detalleVentaRepository) {
+    public DetalleVentaService(DetalleVentaRepository detalleVentaRepository,
+                               VentaRepository ventaRepository,
+                               ProductoRepository productoRepository){
         this.detalleVentaRepository = detalleVentaRepository;
+        this.ventaRepository = ventaRepository;
+        this.productoRepository = productoRepository;
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<DetalleVenta> listarTodos() {
+    public List<DetalleVenta> listarVentas() {
         return detalleVentaRepository.findAll();
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<DetalleVenta> buscarPorCodigo(Long codigo) {
-        return detalleVentaRepository.findById(codigo);
+    public List<DetalleVenta> listarEstado() {
+        return detalleVentaRepository.findAll();
     }
 
     @Override
+    @Transactional
     public DetalleVenta guardar(DetalleVenta detalleVenta) {
-        validarDetalleVenta(detalleVenta);
-        if (detalleVenta.getEstado() == null) {
-            detalleVenta.setEstado(1L);
-        }
-        if (detalleVenta.getSubtotal() == null || detalleVenta.getSubtotal().compareTo(BigDecimal.ZERO) == 0) {
-            BigDecimal subtotal = detalleVenta.getPrecioUnitario()
-                    .multiply(BigDecimal.valueOf(detalleVenta.getCantidad()));
-            detalleVenta.setSubtotal(subtotal);
-        }
+        Venta ventaReal = ventaRepository.findById(detalleVenta.getVentas().getCodigoVenta()).orElse(null);
+        Producto productoReal = productoRepository.findById(detalleVenta.getProducto().getCodigoProducto()).orElse(null);
+
+        detalleVenta.setVentas(ventaReal);
+        detalleVenta.setProducto(productoReal);
+
         return detalleVentaRepository.save(detalleVenta);
     }
 
     @Override
-    public DetalleVenta actualizar(Long codigo, DetalleVenta detalleVenta) {
-        if (!detalleVentaRepository.existsById(codigo)) {
-            throw new RuntimeException("DetalleVenta no encontrado con código: " + codigo);
-        }
-        detalleVenta.setCodigoDetalleVenta(codigo);
-        validarDetalleVenta(detalleVenta);
-        BigDecimal subtotal = detalleVenta.getPrecioUnitario()
-                .multiply(BigDecimal.valueOf(detalleVenta.getCantidad()));
-        detalleVenta.setSubtotal(subtotal);
-        return detalleVentaRepository.save(detalleVenta);
-    }
-
-    @Override
-    public void eliminar(Long codigo) {
-        if (!detalleVentaRepository.existsById(codigo)) {
-            throw new RuntimeException("DetalleVenta no encontrado con código: " + codigo);
-        }
-        detalleVentaRepository.deleteById(codigo);
+    @Transactional
+    public Optional<DetalleVenta> buscarPorId(int id) {
+        return detalleVentaRepository.findById((long) id);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public boolean existePorCodigo(Long codigo) {
-        return detalleVentaRepository.existsById(codigo);
+    public boolean existePorId(int id) {
+        return detalleVentaRepository.existsById((long)id);
+
     }
 
-    @Override
-    @Transactional(readOnly = true)
-    public List<DetalleVenta> listarPorVenta(Long codigoVenta) {
-        return detalleVentaRepository.findByVenta_CodigoVenta(codigoVenta);
-    }
-
-    private void validarDetalleVenta(DetalleVenta detalleVenta) {
-        if (detalleVenta.getVenta() == null) {
-            throw new IllegalArgumentException("La venta es obligatoria");
-        }
-        if (detalleVenta.getProducto() == null) {
-            throw new IllegalArgumentException("El producto es obligatorio");
-        }
-        if (detalleVenta.getCantidad() == null || detalleVenta.getCantidad() <= 0) {
-            throw new IllegalArgumentException("La cantidad debe ser mayor a cero");
-        }
-        if (detalleVenta.getPrecioUnitario() == null || detalleVenta.getPrecioUnitario().compareTo(BigDecimal.ZERO) <= 0) {
-            throw new IllegalArgumentException("El precio unitario debe ser mayor a cero");
-        }
-    }
 }

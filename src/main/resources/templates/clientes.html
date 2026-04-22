@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${viewTitle} + ' — KinalApp'">Clientes — KinalApp</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --bg: #f5f5f0; --surface: #ffffff; --border: #ddddd8;
+            --text: #1a1a1a; --muted: #888880; --accent: #2a5caa;
+            --accent-hover: #1e4488; --nav-bg: #1a1a1a; --nav-text: #f0f0eb;
+            --nav-muted: #888880; --error-bg: #fff0f0; --error-border: #e5b3b3;
+            --error-text: #c0392b; --success-bg: #f0fff4; --success-border: #a3d9b1;
+            --success-text: #1e7e34;
+        }
+        body { font-family: 'Georgia', serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+        nav { background: var(--nav-bg); padding: 0 32px; display: flex; align-items: center; justify-content: space-between; height: 56px; position: sticky; top: 0; z-index: 100; }
+        .nav-brand { font-size: 16px; letter-spacing: 3px; text-transform: uppercase; color: var(--nav-text); }
+        .nav-links { display: flex; list-style: none; }
+        .nav-links a { display: block; padding: 0 18px; height: 56px; line-height: 56px; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; text-decoration: none; color: var(--nav-muted); font-family: 'Courier New', monospace; transition: color 0.2s, background 0.2s; }
+        .nav-links a:hover, .nav-links a.active { color: var(--nav-text); background: rgba(255,255,255,0.06); }
+        .nav-user { font-size: 11px; font-family: 'Courier New', monospace; color: var(--nav-muted); display: flex; align-items: center; gap: 16px; }
+        .nav-user span { color: var(--nav-text); }
+        .nav-user a { color: var(--nav-muted); text-decoration: none; transition: color 0.2s; }
+        .nav-user a:hover { color: #e07070; }
+        main { max-width: 1000px; margin: 0 auto; padding: 40px 24px; }
+        .page-header { margin-bottom: 24px; border-bottom: 1px solid var(--border); padding-bottom: 20px; display: flex; align-items: flex-end; justify-content: space-between; }
+        .page-header h2 { font-size: 22px; font-weight: normal; letter-spacing: 1px; }
+        .page-header p { font-size: 12px; color: var(--muted); margin-top: 4px; font-family: 'Courier New', monospace; }
+        .btn-primary { padding: 9px 20px; background: var(--accent); color: #fff; border: none; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; font-family: 'Courier New', monospace; text-decoration: none; transition: background 0.2s; }
+        .btn-primary:hover { background: var(--accent-hover); }
+        .alert { padding: 10px 14px; font-size: 13px; margin-bottom: 20px; border: 1px solid; font-family: 'Courier New', monospace; }
+        .alert-error { background: var(--error-bg); border-color: var(--error-border); color: var(--error-text); }
+        .alert-success { background: var(--success-bg); border-color: var(--success-border); color: var(--success-text); }
+        .search-bar { display: flex; gap: 8px; margin-bottom: 20px; }
+        .search-bar input { flex: 1; padding: 9px 12px; border: 1px solid var(--border); background: var(--surface); font-size: 13px; font-family: 'Georgia', serif; outline: none; }
+        .search-bar input:focus { border-color: var(--accent); }
+        table { width: 100%; border-collapse: collapse; background: var(--surface); border: 1px solid var(--border); }
+        thead { background: var(--bg); }
+        th { padding: 10px 14px; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); font-family: 'Courier New', monospace; text-align: left; border-bottom: 1px solid var(--border); font-weight: normal; }
+        td { padding: 12px 14px; font-size: 13px; border-bottom: 1px solid var(--border); }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: #f9f9f6; }
+        .badge { display: inline-block; font-size: 10px; font-family: 'Courier New', monospace; letter-spacing: 1px; padding: 2px 8px; }
+        .badge-active { background: var(--success-bg); color: var(--success-text); border: 1px solid var(--success-border); }
+        .badge-inactive { background: var(--error-bg); color: var(--error-text); border: 1px solid var(--error-border); }
+        .actions { display: flex; gap: 8px; }
+        .btn-sm { padding: 4px 12px; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; font-family: 'Courier New', monospace; text-decoration: none; border: 1px solid; cursor: pointer; }
+        .btn-edit { color: var(--accent); border-color: var(--accent); background: transparent; }
+        .btn-edit:hover { background: var(--accent); color: #fff; }
+        .btn-delete { color: var(--error-text); border-color: var(--error-border); background: transparent; }
+        .btn-delete:hover { background: var(--error-text); color: #fff; }
+        .empty { text-align: center; padding: 48px; color: var(--muted); font-family: 'Courier New', monospace; font-size: 13px; }
+    </style>
+</head>
+<body>
+<nav>
+    <span class="nav-brand">KinalApp</span>
+    <ul class="nav-links">
+        <li><a th:href="@{/dashboard}">Inicio</a></li>
+        <li><a th:href="@{/ventas}">Ventas</a></li>
+        <li><a th:href="@{/clientes}" class="active">Clientes</a></li>
+        <li><a th:href="@{/productos}">Productos</a></li>
+        <li><a th:href="@{/usuarios}">Usuarios</a></li>
+    </ul>
+    <div class="nav-user">
+        Hola, <span th:text="${session.usuarioLogueado?.username ?: 'Usuario'}">Usuario</span>
+        &nbsp;|&nbsp;<a th:href="@{/logout}">Salir</a>
+    </div>
+</nav>
+<main>
+    <div class="page-header">
+        <div>
+            <h2 th:text="${viewTitle}">Clientes</h2>
+            <p>Gestión de clientes registrados</p>
+        </div>
+        <a th:href="@{/clientes/nuevo}" class="btn-primary">+ Nuevo cliente</a>
+    </div>
+
+    <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+
+    <div class="search-bar">
+        <form th:action="@{/clientes/buscar}" method="get" style="display:flex;gap:8px;width:100%">
+            <input type="text" name="dpi" placeholder="Buscar por DPI..." />
+            <button type="submit" class="btn-primary">Buscar</button>
+            <a th:href="@{/clientes}" class="btn-primary" style="background:transparent;color:var(--muted);border:1px solid var(--border);">Ver todos</a>
+        </form>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>DPI</th>
+                <th>Nombre</th>
+                <th>Apellido</th>
+                <th>Dirección</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:if="${#lists.isEmpty(clientes)}">
+                <td colspan="6" class="empty">No hay clientes registrados</td>
+            </tr>
+            <tr th:each="cliente : ${clientes}">
+                <td th:text="${cliente.DPICliente}" style="font-family:'Courier New',monospace;font-size:12px;"></td>
+                <td th:text="${cliente.nombreCliente}"></td>
+                <td th:text="${cliente.apellidoCliente}"></td>
+                <td th:text="${cliente.direccion}"></td>
+                <td>
+                    <span th:if="${cliente.estado == 1}" class="badge badge-active">Activo</span>
+                    <span th:if="${cliente.estado != 1}" class="badge badge-inactive">Inactivo</span>
+                </td>
+                <td>
+                    <div class="actions">
+                        <a th:href="@{/clientes/editar/{dpi}(dpi=${cliente.DPICliente})}" class="btn-sm btn-edit">Editar</a>
+                        <a th:href="@{/clientes/eliminar/{dpi}(dpi=${cliente.DPICliente})}" class="btn-sm btn-delete"
+                           onclick="return confirm('¿Eliminar este cliente?')">Eliminar</a>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</main>
+</body>
+</html>

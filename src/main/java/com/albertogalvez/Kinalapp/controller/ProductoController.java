@@ -17,7 +17,6 @@ public class ProductoController {
         this.productoService = productoService;
     }
 
-    // LISTAR TODOS
     @GetMapping
     public String listarTodos(Model model) {
         model.addAttribute("productos", productoService.listarTodos());
@@ -25,7 +24,6 @@ public class ProductoController {
         return "productos";
     }
 
-    // LISTAR ACTIVOS
     @GetMapping("/activos")
     public String listarActivos(Model model) {
         model.addAttribute("productos", productoService.listarEstadoProductos());
@@ -33,7 +31,6 @@ public class ProductoController {
         return "productos";
     }
 
-    // FORMULARIO NUEVO
     @GetMapping("/nuevo")
     public String mostrarFormularioNuevo(Model model) {
         model.addAttribute("producto", new Producto());
@@ -41,47 +38,39 @@ public class ProductoController {
         return "formularioProducto";
     }
 
-    // GUARDAR
     @PostMapping("/guardar")
     public String guardar(@ModelAttribute Producto producto, RedirectAttributes flash) {
         try {
-            if (producto.getEstado() == 0) {
-                producto.setEstado(1);
-            }
             productoService.guardar(producto);
-            flash.addFlashAttribute("success", "Producto guardado correctamente");
+            flash.addFlashAttribute("success", "Producto guardado correctamente.");
         } catch (Exception e) {
             flash.addFlashAttribute("error", "Error al guardar: " + e.getMessage());
         }
         return "redirect:/productos";
     }
 
-    // FORMULARIO EDITAR
     @GetMapping("/editar/{id}")
     public String mostrarFormularioEditar(@PathVariable int id, Model model, RedirectAttributes flash) {
-        var producto = productoService.buscarPorId(id);
-        if (producto.isPresent()) {
-            model.addAttribute("producto", producto.get());
-            model.addAttribute("viewTitle", "Editar Producto: " + producto.get().getNombreProducto());
-            return "formularioProducto";
-        } else {
-            flash.addFlashAttribute("error", "El producto no existe");
-            return "redirect:/productos";
-        }
+        // map + orElseGet en lugar de isPresent/get
+        return productoService.buscarPorId(id)
+                .map(producto -> {
+                    model.addAttribute("producto", producto);
+                    model.addAttribute("viewTitle", "Editar: " + producto.getNombreProducto());
+                    return "formularioProducto";
+                })
+                .orElseGet(() -> {
+                    flash.addFlashAttribute("error", "El producto no existe.");
+                    return "redirect:/productos";
+                });
     }
 
-    // ELIMINAR
     @GetMapping("/eliminar/{id}")
     public String eliminar(@PathVariable int id, RedirectAttributes flash) {
         try {
-            if (productoService.existePorId(id)) {
-                productoService.eliminar(id);
-                flash.addFlashAttribute("success", "Producto eliminado con éxito");
-            } else {
-                flash.addFlashAttribute("error", "No se pudo eliminar, el producto no existe");
-            }
+            productoService.eliminar(id);
+            flash.addFlashAttribute("success", "Producto eliminado con éxito.");
         } catch (Exception e) {
-            flash.addFlashAttribute("error", "Error al eliminar: " + e.getMessage());
+            flash.addFlashAttribute("error", "No se pudo eliminar: " + e.getMessage());
         }
         return "redirect:/productos";
     }

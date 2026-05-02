@@ -2,48 +2,72 @@ package com.albertogalvez.Kinalapp.service;
 
 import com.albertogalvez.Kinalapp.entity.Usuario;
 import com.albertogalvez.Kinalapp.repository.UsuarioRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
 import java.util.Optional;
 
 @Service
 @Transactional
-public class UsuarioService implements IUsuarioService{
+public class UsuarioService implements IUsuarioService {
 
     private final UsuarioRepository usuarioRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UsuarioService(UsuarioRepository usuarioRepository){this.usuarioRepository = usuarioRepository; }
+    public UsuarioService(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder) {
+        this.usuarioRepository = usuarioRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
 
-    @Override
-    @Transactional(readOnly = true)
-    public List<Usuario> listarTodos(){
-        return usuarioRepository.findAll();
+    @Override @Transactional(readOnly = true)
+    public List<Usuario> listarTodos() {
+        // Ordenados alfabéticamente por username
+        return usuarioRepository.findAll()
+                .stream()
+                .sorted((a, b) -> a.getUsername().compareToIgnoreCase(b.getUsername()))
+                .toList();
     }
 
     @Override
     public List<Usuario> listarEstadoUsuario() {
+        // Solo activos, ordenados por rol primero luego por nombre
         return usuarioRepository.findAll()
                 .stream()
-                .filter(usuario -> usuario.getEstado() == 1)
+                .filter(u -> u.getEstado() == 1)
+                .sorted((a, b) -> {
+                    int cmpRol = a.getRol().compareToIgnoreCase(b.getRol());
+                    return cmpRol != 0 ? cmpRol : a.getUsername().compareToIgnoreCase(b.getUsername());
+                })
                 .toList();
     }
 
     @Override
     public Usuario guardar(Usuario usuario) {
+        usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
 
-        validarUsuario(usuario);
-        if(usuario.getEstado() == 0)
-            usuario.setEstado(1);
+        // Switch expression para asignar estado según el rol
+        int estadoPorDefecto = switch (usuario.getRol() == null ? "" : usuario.getRol().toUpperCase()) {
+            case "ADMIN" -> 1;   // Admin siempre activo
+            case "USER"  -> 1;   // User activo por defecto
+            default      -> {
+                usuario.setRol("USER");
+                yield 1;
+            }
+        };
+        if (usuario.getEstado() == 0) usuario.setEstado(estadoPorDefecto);
 
         return usuarioRepository.save(usuario);
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public Optional<Usuario> buscarPorId(int id){
-        return usuarioRepository.findById((long)id);
+    public Usuario guardarSinEncriptar(Usuario usuario) {
+        return usuarioRepository.save(usuario);
+    }
+
+    @Override @Transactional(readOnly = true)
+    public Optional<Usuario> buscarPorId(int id) {
+        return usuarioRepository.findById((long) id);
     }
 
     @Override
@@ -53,46 +77,17 @@ public class UsuarioService implements IUsuarioService{
 
     @Override
     public Usuario actualizar(int id, Usuario usuario) {
-        if(!usuarioRepository.existsById((long)id)){
-            throw new RuntimeException("Usuario no encontrado por ID" + id );
-        }
-        usuario.setCodigoUsuario((long)id);
-        validarUsuario(usuario);
+        usuario.setCodigoUsuario((long) id);
         return usuarioRepository.save(usuario);
     }
 
     @Override
-    public void eliminar (int id) {
-        if(!usuarioRepository.existsById((long)id)){
-            throw new RuntimeException("El usuario no se encontro con el ID" + id);
-        }
-        usuarioRepository.deleteById((long)id);
+    public void eliminar(int id) {
+        usuarioRepository.deleteById((long) id);
     }
 
-    @Override
-    @Transactional(readOnly = true)
+    @Override @Transactional(readOnly = true)
     public boolean existePorId(int id) {
-        return usuarioRepository.existsById((long)id);
-    }
-
-    private void validarUsuario(Usuario usuario){
-        if(usuario == null )
-            throw new IllegalArgumentException("El usuario no puede ser nulo");
-
-        if(usuario.getUsername() == null || usuario.getUsername().trim().isEmpty()){
-            throw new IllegalArgumentException("El Nombre es un dato obligatorio");
-        }
-
-        if(usuario.getPassword() == null || usuario.getPassword().trim().isEmpty()){
-            throw new IllegalArgumentException("La contraseña es un dato obligatorio");
-        }
-
-        if(usuario.getEmail() == null || usuario.getEmail().trim().isEmpty()){
-            throw new IllegalArgumentException("El Email es un dato obligatorio");
-        }
-
-        if(usuario.getRol() == null || usuario.getRol().trim().isEmpty()){
-            throw new IllegalArgumentException("La Rol es un dato obligatorio");
-        }
+        return usuarioRepository.existsById((long) id);
     }
 }

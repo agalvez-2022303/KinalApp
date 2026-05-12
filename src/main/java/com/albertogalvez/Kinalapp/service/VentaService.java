@@ -1,13 +1,15 @@
 package com.albertogalvez.Kinalapp.service;
 
+import com.albertogalvez.Kinalapp.entity.Cliente;
+import com.albertogalvez.Kinalapp.entity.Usuario;
 import com.albertogalvez.Kinalapp.entity.Venta;
-import com.albertogalvez.Kinalapp.repository.VentaRepository;
 import com.albertogalvez.Kinalapp.repository.ClienteRepository;
 import com.albertogalvez.Kinalapp.repository.UsuarioRepository;
+import com.albertogalvez.Kinalapp.repository.VentaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,9 +21,7 @@ public class VentaService implements IVentaService {
     private final ClienteRepository clienteRepository;
     private final UsuarioRepository usuarioRepository;
 
-    public VentaService(VentaRepository ventaRepository,
-                        ClienteRepository clienteRepository,
-                        UsuarioRepository usuarioRepository) {
+    public VentaService(VentaRepository ventaRepository,  ClienteRepository clienteRepository, UsuarioRepository usuarioRepository) {
         this.ventaRepository = ventaRepository;
         this.clienteRepository = clienteRepository;
         this.usuarioRepository = usuarioRepository;
@@ -34,84 +34,62 @@ public class VentaService implements IVentaService {
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public Optional<Venta> buscarPorCodigo(Long codigo) {
-        return ventaRepository.findById(codigo);
+    public List<Venta> listarEstadoVenta() {
+        return ventaRepository.findAll();
+
     }
 
     @Override
+    @Transactional
     public Venta guardar(Venta venta) {
-        validarVenta(venta);
-        if (!clienteRepository.existsById(venta.getCliente().getDPICliente())) {
-            throw new IllegalArgumentException("Cliente no encontrado");
-        }
-        if (!usuarioRepository.existsById(venta.getUsuario().getCodigoUsuario())) {
-            throw new IllegalArgumentException("Usuario no encontrado");
-        }
+        Cliente clienteReal = clienteRepository.findById(venta.getCliente().getDPICliente()).orElse(null);
+        Usuario usuarioReal = usuarioRepository.findById(venta.getUsuario().getCodigoUsuario()).orElse(null);
+
+        venta.setCliente(clienteReal);
+        venta.setUsuario(usuarioReal);
+
         if (venta.getEstado() == 0) {
             venta.setEstado(1);
         }
+
         return ventaRepository.save(venta);
     }
 
     @Override
-    public Venta actualizar(Long codigo, Venta venta) {
-        if (!ventaRepository.existsById(codigo)) {
-            throw new RuntimeException("Venta no encontrada con código: " + codigo);
+    @Transactional
+    public Optional<Venta> buscarPorId(int id) {
+
+        return ventaRepository.findById((long) id);
+    }
+
+    @Override
+    @Transactional
+
+    public Venta actualizar(int id, Venta venta) {
+        if (!ventaRepository.existsById((long) id)){
+            throw new RuntimeException("Venta no encontrada por ID" + id);
         }
-        venta.setCodigoVenta(codigo);
+
+        venta.setCodigoVenta((long) id);
         validarVenta(venta);
-        // Validar que el cliente y usuario existan (pueden cambiar en la actualización)
-        if (!clienteRepository.existsById(venta.getCliente().getDPICliente())) {
-            throw new IllegalArgumentException("Cliente no encontrado");
-        }
-        if (!usuarioRepository.existsById(venta.getUsuario().getCodigoUsuario())) {
-            throw new IllegalArgumentException("Usuario no encontrado");
-        }
+
         return ventaRepository.save(venta);
     }
 
     @Override
-    public void eliminar(Long codigo) {
-        if (!ventaRepository.existsById(codigo)) {
-            throw new RuntimeException("Venta no encontrada con código: " + codigo);
-        }
-        ventaRepository.deleteById(codigo);
-    }
-
-    @Override
     @Transactional(readOnly = true)
-    public boolean existePorCodigo(Long codigo) {
-        return ventaRepository.existsById(codigo);
+    public boolean existePorId(int id) {
+        return ventaRepository.existsById((long)id);
     }
 
-    @Override
-    @Transactional(readOnly = true)
-    public List<Venta> listarPorEstado(int estado) {
-        return ventaRepository.findByEstado(estado);
-    }
+    private void validarVenta(Venta venta){
+        if (venta == null)
+            throw new IllegalArgumentException("La venta no puede ser nula");
 
-    @Override
-    @Transactional(readOnly = true)
-    public List<Venta> listarPorCliente(String dpiCliente) {
-        return ventaRepository.findByClienteDPICliente(dpiCliente);
-    }
+        if (venta.getFechaVenta() == null)
+            throw new IllegalArgumentException("La fecha no puede ser nula");
 
-    private void validarVenta(Venta venta) {
-        if (venta.getFechaVenta() == null) {
-            throw new IllegalArgumentException("La fecha de venta es obligatoria");
-        }
-        if (venta.getTotal() == null) {
-            throw new IllegalArgumentException("El total es obligatorio");
-        }
-        if (venta.getTotal().compareTo(BigDecimal.ZERO) <= 0) {
-            throw new IllegalArgumentException("El total debe ser mayor a cero");
-        }
-        if (venta.getCliente() == null) {
-            throw new IllegalArgumentException("El cliente es obligatorio");
-        }
-        if (venta.getUsuario() == null) {
-            throw new IllegalArgumentException("El usuario es obligatorio");
-        }
+        if (venta.getTotal() == null)
+            throw new IllegalArgumentException("El total no puede ser nulo");
     }
 }

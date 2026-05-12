@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${viewTitle} + ' — KinalApp'">Formulario Usuario — KinalApp</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg: #f5f5f0;
+            --surface: #ffffff;
+            --border: #ddddd8;
+            --text: #1a1a1a;
+            --muted: #888880;
+            --accent: #2a5caa;
+            --accent-hover: #1e4488;
+            --nav-bg: #1a1a1a;
+            --nav-text: #f0f0eb;
+            --nav-muted: #888880;
+            --error-bg: #fff0f0;
+            --error-border: #e5b3b3;
+            --error-text: #c0392b;
+            --success-bg: #f0fff4;
+            --success-border: #a3d9b1;
+            --success-text: #1e7e34;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        /* NAV */
+        nav {
+            background: var(--nav-bg);
+            padding: 0 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 56px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-brand {
+            font-size: 16px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--nav-text);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 0;
+            list-style: none;
+        }
+
+        .nav-links a {
+            display: block;
+            padding: 0 18px;
+            height: 56px;
+            line-height: 56px;
+            font-size: 11px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            text-decoration: none;
+            color: var(--nav-muted);
+            font-family: 'Courier New', monospace;
+            transition: color 0.2s, background 0.2s;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            color: var(--nav-text);
+            background: rgba(255,255,255,0.06);
+        }
+
+        .nav-user {
+            font-size: 11px;
+            font-family: 'Courier New', monospace;
+            color: var(--nav-muted);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .nav-user span { color: var(--nav-text); }
+
+        .nav-user a {
+            color: var(--nav-muted);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .nav-user a:hover { color: #e07070; }
+
+        /* MAIN */
+        main {
+            max-width: 640px;
+            margin: 0 auto;
+            padding: 40px 24px;
+        }
+
+        .page-header {
+            margin-bottom: 32px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 20px;
+        }
+
+        .page-header h2 {
+            font-size: 22px;
+            font-weight: normal;
+            letter-spacing: 1px;
+            color: var(--text);
+        }
+
+        .page-header p {
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 4px;
+            font-family: 'Courier New', monospace;
+        }
+
+        /* ALERTS */
+        .alert {
+            padding: 10px 14px;
+            font-size: 13px;
+            margin-bottom: 24px;
+            border: 1px solid;
+            font-family: 'Courier New', monospace;
+        }
+
+        .alert-error {
+            background: var(--error-bg);
+            border-color: var(--error-border);
+            color: var(--error-text);
+        }
+
+        .alert-success {
+            background: var(--success-bg);
+            border-color: var(--success-border);
+            color: var(--success-text);
+        }
+
+        /* CARD */
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 36px 32px;
+        }
+
+        /* FORM */
+        .form-group {
+            margin-bottom: 22px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        label {
+            display: block;
+            font-size: 11px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 6px;
+            font-family: 'Courier New', monospace;
+        }
+
+        input[type="text"],
+        input[type="password"],
+        input[type="email"],
+        select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            background: var(--bg);
+            font-size: 14px;
+            color: var(--text);
+            font-family: 'Georgia', serif;
+            outline: none;
+            transition: border-color 0.2s;
+            appearance: none;
+        }
+
+        select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23888880' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 32px;
+            cursor: pointer;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--accent);
+        }
+
+        /* ESTADO TOGGLE */
+        .estado-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            background: var(--bg);
+        }
+
+        .estado-group input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            accent-color: var(--accent);
+        }
+
+        .estado-group span {
+            font-size: 13px;
+            color: var(--text);
+            font-family: 'Courier New', monospace;
+        }
+
+        /* HIDDEN id field note */
+        .edit-badge {
+            display: inline-block;
+            font-size: 10px;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            padding: 2px 8px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            color: var(--muted);
+            margin-bottom: 24px;
+        }
+
+        /* ACTIONS */
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border);
+        }
+
+        .btn-primary {
+            flex: 1;
+            padding: 11px;
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            font-size: 12px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            transition: background 0.2s;
+        }
+
+        .btn-primary:hover { background: var(--accent-hover); }
+
+        .btn-secondary {
+            flex: 1;
+            padding: 11px;
+            background: transparent;
+            color: var(--muted);
+            border: 1px solid var(--border);
+            font-size: 12px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            text-decoration: none;
+            text-align: center;
+            line-height: 1.4;
+            transition: border-color 0.2s, color 0.2s;
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--text);
+            color: var(--text);
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <span class="nav-brand">KinalApp</span>
+    <ul class="nav-links">
+        <li><a th:href="@{/dashboard}">Inicio</a></li>
+        <li><a th:href="@{/ventas}">Ventas</a></li>
+        <li><a th:href="@{/clientes}">Clientes</a></li>
+        <li><a th:href="@{/productos}">Productos</a></li>
+        <li><a th:href="@{/usuarios}" class="active">Usuarios</a></li>
+    </ul>
+    <div class="nav-user">
+        Hola, <span th:text="${session.usuarioLogueado?.nombre ?: 'Usuario'}">Usuario</span>
+        &nbsp;|&nbsp;
+        <a th:href="@{/logout}">Salir</a>
+    </div>
+</nav>
+
+<main>
+    <div class="page-header">
+        <h2 th:text="${viewTitle}">Formulario Usuario</h2>
+        <p th:text="${usuario.codigoUsuario != null} ? 'Modifica los datos del usuario' : 'Completa los campos para registrar un nuevo usuario'">
+            Completa los campos para registrar un nuevo usuario
+        </p>
+    </div>
+
+    <!-- Alertas flash -->
+    <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+
+    <div class="card">
+
+        <!-- Badge de edición -->
+        <span th:if="${usuario.codigoUsuario != null}" class="edit-badge">
+            Editando ID #<span th:text="${usuario.codigoUsuario}"></span>
+        </span>
+
+        <form th:action="@{/usuarios/guardar}" th:object="${usuario}" method="post">
+
+            <!-- ID oculto para edición -->
+            <input type="hidden" th:field="*{codigoUsuario}" />
+
+            <!-- Username y Email -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="username">Usuario</label>
+                    <input type="text"
+                           id="username"
+                           th:field="*{username}"
+                           placeholder="nombre_usuario"
+                           required />
+                </div>
+                <div class="form-group">
+                    <label for="email">Correo electrónico</label>
+                    <input type="email"
+                           id="email"
+                           th:field="*{email}"
+                           placeholder="correo@ejemplo.com"
+                           required />
+                </div>
+            </div>
+
+            <!-- Contraseña -->
+            <div class="form-group">
+                <label for="password">Contraseña</label>
+                <input type="password"
+                       id="password"
+                       th:field="*{password}"
+                       placeholder="••••••••"
+                       required />
+            </div>
+
+            <!-- Rol y Estado -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="rol">Rol</label>
+                    <select id="rol" th:field="*{rol}" required>
+                        <option value="" disabled>Selecciona un rol</option>
+                        <option value="ADMIN">Administrador</option>
+                        <option value="VENDEDOR">Vendedor</option>
+                        <option value="VISOR">Visor</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Estado</label>
+                    <div class="estado-group">
+                        <input type="checkbox"
+                               id="estadoCheck"
+                               th:checked="${usuario.estado == 1}"
+                               onchange="document.getElementById('estadoVal').value = this.checked ? 1 : 0" />
+                        <input type="hidden" id="estadoVal" th:field="*{estado}" />
+                        <span>Activo</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botones -->
+            <div class="form-actions">
+                <a th:href="@{/usuarios}" class="btn-secondary">Cancelar</a>
+                <button type="submit" class="btn-primary"
+                        th:text="${usuario.codigoUsuario != null} ? 'Guardar cambios' : 'Registrar usuario'">
+                    Registrar usuario
+                </button>
+            </div>
+
+        </form>
+    </div>
+</main>
+
+</body>
+</html>

@@ -6,12 +6,12 @@ import java.util.Optional;
 
 public interface IUsuarioService {
     List<Usuario> listarTodos();
-    Optional<Usuario> buscarPorCodigo(Long codigo);
-    Usuario guardar(Usuario usuario);
-    Usuario actualizar(Long codigo, Usuario usuario);
-    void eliminar(Long codigo);
-    boolean existePorCodigo(Long codigo);
-    List<Usuario> listarPorEstado(int estado);
-    Optional<Usuario> buscarPorUsername(String username);
-    boolean existeUsername(String username);
+    List<Usuario> listarEstadoUsuario();
+    Usuario guardar(Usuario usuario);           // encripta password
+    Usuario guardarSinEncriptar(Usuario usuario); // ya viene encriptado
+    Optional<Usuario> buscarPorId(int id);
+    Optional<Usuario> buscarPorEmail(String email);
+    Usuario actualizar(int id, Usuario usuario);
+    void eliminar(int id);
+    boolean existePorId(int id);
 }

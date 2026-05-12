@@ -1,6 +1,9 @@
 package com.albertogalvez.Kinalapp.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+
+import java.util.List;
 
 @Entity
 @Table(name = "usuarios")
@@ -10,23 +13,24 @@ public class Usuario {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "codigo_usuario")
     private Long codigoUsuario;
-
-    @Column(name = "username", nullable = false, length = 45)
+    @Column(nullable = false)
     private String username;
-
-    @Column(name = "password", nullable = false, length = 45)
+    @Column(nullable = false)
     private String password;
-
-    @Column(name = "email", nullable = false, length = 60)
+    @Column(nullable = false)
     private String email;
-
-    @Column(name = "rol", nullable = false, length = 45)
+    @Column(nullable = false)
     private String rol;
-
-    @Column(name = "estado")
+    @Column(nullable = false)
     private int estado;
 
-    public Usuario() {}
+
+    @OneToMany(mappedBy = "usuario")
+    @JsonIgnore
+    private List<Venta> ventas;
+
+    public Usuario() {
+    }
 
     public Usuario(Long codigoUsuario, String username, String password, String email, String rol, int estado) {
         this.codigoUsuario = codigoUsuario;
@@ -83,5 +87,13 @@ public class Usuario {
 
     public void setEstado(int estado) {
         this.estado = estado;
+    }
+
+    public List<Venta> getVentas() {
+        return ventas;
+    }
+
+    public void setVentas(List<Venta> ventas) {
+        this.ventas = ventas;
     }
 }

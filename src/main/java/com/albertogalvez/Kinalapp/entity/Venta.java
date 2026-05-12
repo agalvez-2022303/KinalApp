@@ -1,6 +1,8 @@
 package com.albertogalvez.Kinalapp.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
@@ -13,28 +15,28 @@ public class Venta {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "codigo_venta")
     private Long codigoVenta;
-
-    @Column(name = "fecha_venta", nullable = false)
+    @Column
     private LocalDate fechaVenta;
-
-    @Column(name = "total", nullable = false, precision = 10, scale = 2)
+    @Column(precision = 10, scale = 2, nullable = false)
     private BigDecimal total;
-
-    @Column(name = "estado")
+    @Column(nullable = false)
     private int estado;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "Clientes_dpi_cliente", referencedColumnName = "dpi_cliente", nullable = false)
     private Cliente cliente;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "Usuarios_codigo_usuario", referencedColumnName = "codigo_usuario", nullable = false)
     private Usuario usuario;
 
-    @OneToMany(mappedBy = "venta", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<DetalleVenta> detalles;
 
-    public Venta() {}
+    @JsonIgnore
+    @OneToMany(mappedBy = "ventas")
+    private List<DetalleVenta> detalleVentas;
+
+    public Venta() {
+    }
 
     public Venta(Long codigoVenta, LocalDate fechaVenta, BigDecimal total, int estado, Cliente cliente, Usuario usuario) {
         this.codigoVenta = codigoVenta;
@@ -93,11 +95,11 @@ public class Venta {
         this.usuario = usuario;
     }
 
-    public List<DetalleVenta> getDetalles() {
-        return detalles;
+    public List<DetalleVenta> getDetalleVentas() {
+        return detalleVentas;
     }
 
-    public void setDetalles(List<DetalleVenta> detalles) {
-        this.detalles = detalles;
+    public void setDetalleVentas(List<DetalleVenta> detalleVentas) {
+        this.detalleVentas = detalleVentas;
     }
 }

@@ -2,9 +2,9 @@ package com.albertogalvez.Kinalapp.service;
 
 import com.albertogalvez.Kinalapp.entity.Usuario;
 import com.albertogalvez.Kinalapp.repository.UsuarioRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
 import java.util.Optional;
 
@@ -13,86 +13,81 @@ import java.util.Optional;
 public class UsuarioService implements IUsuarioService {
 
     private final UsuarioRepository usuarioRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UsuarioService(UsuarioRepository usuarioRepository) {
+    public UsuarioService(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder) {
         this.usuarioRepository = usuarioRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
-    @Override
-    @Transactional(readOnly = true)
+    @Override @Transactional(readOnly = true)
     public List<Usuario> listarTodos() {
-        return usuarioRepository.findAll();
+        // Ordenados alfabéticamente por username
+        return usuarioRepository.findAll()
+                .stream()
+                .sorted((a, b) -> a.getUsername().compareToIgnoreCase(b.getUsername()))
+                .toList();
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public Optional<Usuario> buscarPorCodigo(Long codigo) {
-        return usuarioRepository.findById(codigo);
+    public List<Usuario> listarEstadoUsuario() {
+        // Solo activos, ordenados por rol primero luego por nombre
+        return usuarioRepository.findAll()
+                .stream()
+                .filter(u -> u.getEstado() == 1)
+                .sorted((a, b) -> {
+                    int cmpRol = a.getRol().compareToIgnoreCase(b.getRol());
+                    return cmpRol != 0 ? cmpRol : a.getUsername().compareToIgnoreCase(b.getUsername());
+                })
+                .toList();
     }
 
     @Override
     public Usuario guardar(Usuario usuario) {
-        validarUsuario(usuario);
-        if (usuario.getEstado() == 0) {
-            usuario.setEstado(1);
-        }
+        usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
+
+        // Switch expression para asignar estado según el rol
+        int estadoPorDefecto = switch (usuario.getRol() == null ? "" : usuario.getRol().toUpperCase()) {
+            case "ADMIN" -> 1;   // Admin siempre activo
+            case "USER"  -> 1;   // User activo por defecto
+            default      -> {
+                usuario.setRol("USER");
+                yield 1;
+            }
+        };
+        if (usuario.getEstado() == 0) usuario.setEstado(estadoPorDefecto);
+
         return usuarioRepository.save(usuario);
     }
 
     @Override
-    public Usuario actualizar(Long codigo, Usuario usuario) {
-        if (!usuarioRepository.existsById(codigo)) {
-            throw new RuntimeException("Usuario no encontrado con código: " + codigo);
-        }
-        usuario.setCodigoUsuario(codigo);
-        validarUsuario(usuario);
+    public Usuario guardarSinEncriptar(Usuario usuario) {
+        return usuarioRepository.save(usuario);
+    }
+
+    @Override @Transactional(readOnly = true)
+    public Optional<Usuario> buscarPorId(int id) {
+        return usuarioRepository.findById((long) id);
+    }
+
+    @Override
+    public Optional<Usuario> buscarPorEmail(String email) {
+        return usuarioRepository.findByEmail(email);
+    }
+
+    @Override
+    public Usuario actualizar(int id, Usuario usuario) {
+        usuario.setCodigoUsuario((long) id);
         return usuarioRepository.save(usuario);
     }
 
     @Override
-    public void eliminar(Long codigo) {
-        if (!usuarioRepository.existsById(codigo)) {
-            throw new RuntimeException("Usuario no encontrado con código: " + codigo);
-        }
-        usuarioRepository.deleteById(codigo);
+    public void eliminar(int id) {
+        usuarioRepository.deleteById((long) id);
     }
 
-    @Override
-    @Transactional(readOnly = true)
-    public boolean existePorCodigo(Long codigo) {
-        return usuarioRepository.existsById(codigo);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<Usuario> listarPorEstado(int estado) {
-        return usuarioRepository.findByEstado(estado);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public Optional<Usuario> buscarPorUsername(String username) {
-        return usuarioRepository.findByUsername(username);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public boolean existeUsername(String username) {
-        return usuarioRepository.findByUsername(username).isPresent();
-    }
-
-    private void validarUsuario(Usuario usuario) {
-        if (usuario.getUsername() == null || usuario.getUsername().trim().isEmpty()) {
-            throw new IllegalArgumentException("El username es obligatorio");
-        }
-        if (usuario.getPassword() == null || usuario.getPassword().trim().isEmpty()) {
-            throw new IllegalArgumentException("La contraseña es obligatoria");
-        }
-        if (usuario.getEmail() == null || usuario.getEmail().trim().isEmpty()) {
-            throw new IllegalArgumentException("El email es obligatorio");
-        }
-        if (usuario.getRol() == null || usuario.getRol().trim().isEmpty()) {
-            throw new IllegalArgumentException("El rol es obligatorio");
-        }
+    @Override @Transactional(readOnly = true)
+    public boolean existePorId(int id) {
+        return usuarioRepository.existsById((long) id);
     }
 }

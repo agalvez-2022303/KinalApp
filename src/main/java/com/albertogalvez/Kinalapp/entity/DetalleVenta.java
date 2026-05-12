@@ -1,41 +1,44 @@
 package com.albertogalvez.Kinalapp.entity;
 
 import jakarta.persistence.*;
+
 import java.math.BigDecimal;
 
 @Entity
-@Table(name = "detalle_venta")
+@Table(name = "detalleVentas")
 public class DetalleVenta {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "codigo_detalle_venta")
+    @Column(name = "codigo_detalleVenta")
     private Long codigoDetalleVenta;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "Ventas_codigo_venta", nullable = false)
-    private Venta venta;
-
-    @ManyToOne
-    @JoinColumn(name = "codigo_producto", referencedColumnName = "codigo_producto")
-    private Productos producto;
-
-    @Column(name = "cantidad", nullable = false)
-    private Long cantidad;          // cambiado de Integer a Long
-
-    @Column(name = "precio_unitario", precision = 10, scale = 2)
+    @Column(nullable = false)
+    private int cantidad;
+    @Column(precision = 10, scale = 2, nullable = false)
     private BigDecimal precioUnitario;
+    @Column(precision = 10, scale = 2, nullable = false)
+    private BigDecimal subTotal;
 
-    @Column(name = "subtotal", precision = 10, scale = 2)
-    private BigDecimal subtotal;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "Ventas_codigo_venta", referencedColumnName = "codigo_venta", nullable = false)
+    private Venta ventas;
 
-    @Column(name = "estado")
-    private Long estado;             // cambiado de Integer a Long
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "Producto_codigo_producto", referencedColumnName = "codigo_producto",  nullable = false)
+    private Producto producto;
 
-    // Constructor vacío
-    public DetalleVenta() {}
+    public DetalleVenta() {
+    }
 
-    // Getters y Setters actualizados
+    public DetalleVenta(Long codigoDetalleVenta, int cantidad, BigDecimal precioUnitario, BigDecimal subTotal, Venta ventas, Producto producto) {
+        this.codigoDetalleVenta = codigoDetalleVenta;
+        this.cantidad = cantidad;
+        this.precioUnitario = precioUnitario;
+        this.subTotal = subTotal;
+        this.ventas = ventas;
+        this.producto = producto;
+    }
+
     public Long getCodigoDetalleVenta() {
         return codigoDetalleVenta;
     }
@@ -44,27 +47,11 @@ public class DetalleVenta {
         this.codigoDetalleVenta = codigoDetalleVenta;
     }
 
-    public Venta getVenta() {
-        return venta;
-    }
-
-    public void setVenta(Venta venta) {
-        this.venta = venta;
-    }
-
-    public Productos getProducto() {
-        return producto;
-    }
-
-    public void setProducto(Productos producto) {
-        this.producto = producto;
-    }
-
-    public Long getCantidad() {               // tipo Long
+    public int getCantidad() {
         return cantidad;
     }
 
-    public void setCantidad(Long cantidad) {  // tipo Long
+    public void setCantidad(int cantidad) {
         this.cantidad = cantidad;
     }
 
@@ -76,19 +63,27 @@ public class DetalleVenta {
         this.precioUnitario = precioUnitario;
     }
 
-    public BigDecimal getSubtotal() {
-        return subtotal;
+    public BigDecimal getSubTotal() {
+        return subTotal;
     }
 
-    public void setSubtotal(BigDecimal subtotal) {
-        this.subtotal = subtotal;
+    public void setSubTotal(BigDecimal subTotal) {
+        this.subTotal = subTotal;
     }
 
-    public Long getEstado() {                 // tipo Long
-        return estado;
+    public Venta getVentas() {
+        return ventas;
     }
 
-    public void setEstado(Long estado) {      // tipo Long
-        this.estado = estado;
+    public void setVentas(Venta ventas) {
+        this.ventas = ventas;
+    }
+
+    public Producto getProducto() {
+        return producto;
+    }
+
+    public void setProducto(Producto producto) {
+        this.producto = producto;
     }
 }

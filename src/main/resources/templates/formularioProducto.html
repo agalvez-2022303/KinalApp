@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${viewTitle} + ' — KinalApp'">Formulario Producto — KinalApp</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --bg: #f5f5f0; --surface: #ffffff; --border: #ddddd8;
+            --text: #1a1a1a; --muted: #888880; --accent: #2a5caa;
+            --accent-hover: #1e4488; --nav-bg: #1a1a1a; --nav-text: #f0f0eb; --nav-muted: #888880;
+            --error-bg: #fff0f0; --error-border: #e5b3b3; --error-text: #c0392b;
+            --success-bg: #f0fff4; --success-border: #a3d9b1; --success-text: #1e7e34;
+        }
+        body { font-family: 'Georgia', serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+        nav { background: var(--nav-bg); padding: 0 32px; display: flex; align-items: center; justify-content: space-between; height: 56px; position: sticky; top: 0; z-index: 100; }
+        .nav-brand { font-size: 16px; letter-spacing: 3px; text-transform: uppercase; color: var(--nav-text); }
+        .nav-links { display: flex; list-style: none; }
+        .nav-links a { display: block; padding: 0 18px; height: 56px; line-height: 56px; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; text-decoration: none; color: var(--nav-muted); font-family: 'Courier New', monospace; transition: color 0.2s, background 0.2s; }
+        .nav-links a:hover, .nav-links a.active { color: var(--nav-text); background: rgba(255,255,255,0.06); }
+        .nav-user { font-size: 11px; font-family: 'Courier New', monospace; color: var(--nav-muted); display: flex; align-items: center; gap: 16px; }
+        .nav-user span { color: var(--nav-text); }
+        .nav-user a { color: var(--nav-muted); text-decoration: none; }
+        .nav-user a:hover { color: #e07070; }
+        main { max-width: 560px; margin: 0 auto; padding: 40px 24px; }
+        .page-header { margin-bottom: 32px; border-bottom: 1px solid var(--border); padding-bottom: 20px; }
+        .page-header h2 { font-size: 22px; font-weight: normal; letter-spacing: 1px; }
+        .page-header p { font-size: 12px; color: var(--muted); margin-top: 4px; font-family: 'Courier New', monospace; }
+        .alert { padding: 10px 14px; font-size: 13px; margin-bottom: 20px; border: 1px solid; font-family: 'Courier New', monospace; }
+        .alert-error { background: var(--error-bg); border-color: var(--error-border); color: var(--error-text); }
+        .card { background: var(--surface); border: 1px solid var(--border); padding: 36px 32px; }
+        .edit-badge { display: inline-block; font-size: 10px; font-family: 'Courier New', monospace; letter-spacing: 1px; text-transform: uppercase; padding: 2px 8px; background: var(--bg); border: 1px solid var(--border); color: var(--muted); margin-bottom: 24px; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; font-family: 'Courier New', monospace; }
+        input[type="text"], input[type="number"] { width: 100%; padding: 10px 12px; border: 1px solid var(--border); background: var(--bg); font-size: 14px; color: var(--text); font-family: 'Georgia', serif; outline: none; transition: border-color 0.2s; }
+        input:focus { border-color: var(--accent); }
+        .estado-group { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border: 1px solid var(--border); background: var(--bg); }
+        .estado-group input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; accent-color: var(--accent); }
+        .estado-group span { font-size: 13px; font-family: 'Courier New', monospace; }
+        .form-actions { display: flex; gap: 12px; margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--border); }
+        .btn-primary { flex: 1; padding: 11px; background: var(--accent); color: #fff; border: none; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; font-family: 'Courier New', monospace; transition: background 0.2s; }
+        .btn-primary:hover { background: var(--accent-hover); }
+        .btn-secondary { flex: 1; padding: 11px; background: transparent; color: var(--muted); border: 1px solid var(--border); font-size: 12px; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; font-family: 'Courier New', monospace; text-decoration: none; text-align: center; line-height: 1.4; transition: border-color 0.2s, color 0.2s; }
+        .btn-secondary:hover { border-color: var(--text); color: var(--text); }
+    </style>
+</head>
+<body>
+<nav>
+    <span class="nav-brand">KinalApp</span>
+    <ul class="nav-links">
+        <li><a th:href="@{/dashboard}">Inicio</a></li>
+        <li><a th:href="@{/ventas}">Ventas</a></li>
+        <li><a th:href="@{/clientes}">Clientes</a></li>
+        <li><a th:href="@{/productos}" class="active">Productos</a></li>
+        <li><a th:href="@{/usuarios}">Usuarios</a></li>
+    </ul>
+    <div class="nav-user">
+        Hola, <span th:text="${session.usuarioLogueado?.username ?: 'Usuario'}">Usuario</span>
+        &nbsp;|&nbsp;<a th:href="@{/logout}">Salir</a>
+    </div>
+</nav>
+<main>
+    <div class="page-header">
+        <h2 th:text="${viewTitle}">Formulario Producto</h2>
+        <p th:text="${producto.codigoProducto != null} ? 'Modifica los datos del producto' : 'Completa los campos para registrar un nuevo producto'">
+            Completa los campos para registrar un nuevo producto
+        </p>
+    </div>
+
+    <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+
+    <div class="card">
+        <span th:if="${producto.codigoProducto != null}" class="edit-badge">
+            Editando ID #<span th:text="${producto.codigoProducto}"></span>
+        </span>
+
+        <form th:action="@{/productos/guardar}" th:object="${producto}" method="post">
+            <input type="hidden" th:field="*{codigoProducto}" />
+
+            <div class="form-group">
+                <label for="nombreProducto">Nombre del producto</label>
+                <input type="text" id="nombreProducto" th:field="*{nombreProducto}" placeholder="Ej. Laptop Dell" required />
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="precio">Precio (Q)</label>
+                    <input type="number" id="precio" th:field="*{precio}" placeholder="0.00" step="0.01" min="0" required />
+                </div>
+                <div class="form-group">
+                    <label for="stock">Stock</label>
+                    <input type="number" id="stock" th:field="*{stock}" placeholder="0" min="0" required />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Estado</label>
+                <div class="estado-group">
+                    <input type="checkbox" id="estadoCheck"
+                           th:checked="${producto.estado == 1}"
+                           onchange="document.getElementById('estadoVal').value = this.checked ? 1 : 0" />
+                    <input type="hidden" id="estadoVal" th:field="*{estado}" />
+                    <span>Activo</span>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <a th:href="@{/productos}" class="btn-secondary">Cancelar</a>
+                <button type="submit" class="btn-primary"
+                        th:text="${producto.codigoProducto != null} ? 'Guardar cambios' : 'Registrar producto'">
+                    Registrar producto
+                </button>
+            </div>
+        </form>
+    </div>
+</main>
+</body>
+</html>
